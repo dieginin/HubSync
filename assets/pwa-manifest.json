@@ -6,8 +6,8 @@
     "display": "standalone",
     "orientation": "natural",
     "prefer_related_applications": false,
-    "background_color": "Canvas",
-    "theme_color": "Canvas",
+    "background_color": "transparent",
+    "theme_color": "transparent",
     "icons": [
         {
             "src": "icons/apple-touch-icon-192.png",

@@ -29,6 +29,7 @@ class LoginView(ft.View):
             width=300,
             autofocus=True,
             on_submit=self.login,
+            autofill_hints=[ft.AutofillHint.EMAIL, ft.AutofillHint.USERNAME],
         )
         self.password = ft.TextField(
             label="Password",
@@ -36,10 +37,15 @@ class LoginView(ft.View):
             password=True,
             can_reveal_password=True,
             on_submit=self.login,
+            autofill_hints=ft.AutofillHint.PASSWORD,
         )
         login_button = ft.ElevatedButton("Login", width=300, on_click=self.login)
 
-        self.controls = [title, self.email_or_username, self.password, login_button]
+        self.controls = [
+            title,
+            ft.AutofillGroup(ft.Column([self.email_or_username, self.password])),
+            login_button,
+        ]
 
     def login(self, e: ft.ControlEvent) -> None:
         email_or_username = self.email_or_username.value
