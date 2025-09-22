@@ -24,16 +24,24 @@ class LoginView(ft.View):
     def __init_components__(self) -> None:
         title = ft.Text("Login", size=32, weight=ft.FontWeight.BOLD)
         self.email_or_username = ft.TextField(
+            enable_interactive_selection=True,
+            autocorrect=True,
+            enable_suggestions=True,
             label="Email or Username",
             keyboard_type=ft.KeyboardType.EMAIL,
             width=300,
             autofocus=True,
+            can_request_focus=True,
             on_submit=self.login,
             autofill_hints=[ft.AutofillHint.EMAIL, ft.AutofillHint.USERNAME],
         )
         self.password = ft.TextField(
+            enable_interactive_selection=True,
+            autocorrect=True,
+            enable_suggestions=True,
             label="Password",
             width=300,
+            can_request_focus=True,
             password=True,
             can_reveal_password=True,
             on_submit=self.login,
