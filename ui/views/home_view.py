@@ -1,5 +1,7 @@
 import flet as ft
 
+from utils.helpers import error_snackbar, success_snackbar
+
 
 class HomeView(ft.View):
     def __init__(self, page: ft.Page, sbmanager) -> None:
@@ -30,10 +32,9 @@ class HomeView(ft.View):
         self.controls = [title, logout_button]
 
     def logout(self, e: ft.ControlEvent) -> None:
-        self.sbmanager.sign_out()
-        e.page.go("/login")
-        e.page.open(
-            ft.SnackBar(
-                ft.Text("Logged out successfully."), bgcolor=ft.Colors.GREEN_400
-            )
-        )
+        res = self.sbmanager.sign_out()
+        if res.type == "success":
+            e.page.go("/login")
+            success_snackbar(e.page, res.message)
+        else:
+            error_snackbar(e.page, res.message)

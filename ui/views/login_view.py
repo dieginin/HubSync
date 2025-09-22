@@ -1,5 +1,7 @@
 import flet as ft
 
+from utils.helpers import error_snackbar, success_snackbar
+
 
 class LoginView(ft.View):
     def __init__(self, page: ft.Page, sbmanager) -> None:
@@ -44,11 +46,7 @@ class LoginView(ft.View):
         password = self.password.value
 
         if not email_or_username or not password:
-            e.page.open(
-                ft.SnackBar(
-                    ft.Text("Please fill in all fields."), bgcolor=ft.Colors.RED_400
-                )
-            )
+            error_snackbar(e.page, "Please fill in all fields.")
             if not email_or_username:
                 self.email_or_username.focus()
             else:
@@ -59,10 +57,6 @@ class LoginView(ft.View):
 
         if response.type == "success":
             e.page.go("/")
-            e.page.open(
-                ft.SnackBar(ft.Text(response.message), bgcolor=ft.Colors.GREEN_400)
-            )
+            success_snackbar(e.page, response.message)
         else:
-            e.page.open(
-                ft.SnackBar(ft.Text(response.message), bgcolor=ft.Colors.RED_400)
-            )
+            error_snackbar(e.page, response.message)
