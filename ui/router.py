@@ -21,6 +21,7 @@ class PageNotFoundView(ft.View):
 
 class Router:
     def __init__(self, page: ft.Page, sbmanager: SupabaseManager) -> None:
+        page.on_connect = self.on_connect
         page.on_route_change = self.on_route_change
         self.sbmanager = sbmanager
 
@@ -41,8 +42,20 @@ class Router:
             route = route_to if route_to else route
             e.page.go(route)
 
+    def on_connect(self, e: ft.ControlEvent) -> None:
+        if (
+            len(self.sbmanager.auth.admin.list_users()) == 0
+            and e.page.route != "/first"
+        ):
+            e.page.go("/first")
+        elif not self.sbmanager.session and e.page.route != "/login":
+            e.page.go("/login")
+
     def on_route_change(self, e: ft.RouteChangeEvent) -> None:
         e.page.views.clear()
+        if len(self.sbmanager.auth.admin.list_users()) >= 1 and e.route == "/first":
+            e.page.go("/")
+
         if len(self.sbmanager.auth.admin.list_users()) == 0:
             self._set_route(e, "/first", "==")
         elif self.sbmanager.session:
