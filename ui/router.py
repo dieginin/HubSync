@@ -24,27 +24,29 @@ class Router:
         page.on_route_change = self.on_route_change
         self.sbmanager = sbmanager
 
-        if self.sbmanager.session:
-            page.go("/")
+        page.go("/")
+
+    def _set_route(
+        self,
+        e: ft.RouteChangeEvent,
+        route: str,
+        condition: str,
+        route_to: str | None = None,
+    ) -> None:
+        if e.route == route if condition == "==" else e.route != route:
+            e.page.views.append(
+                ROUTES.get(route, PageNotFoundView)(e.page, self.sbmanager)  # type: ignore
+            )
         else:
-            page.go("/login")
+            route = route_to if route_to else route
+            e.page.go(route)
 
     def on_route_change(self, e: ft.RouteChangeEvent) -> None:
         e.page.views.clear()
-
-        if self.sbmanager.session:
-            if e.route != "/login":
-                e.page.views.append(
-                    ROUTES.get(e.route, PageNotFoundView)(e.page, self.sbmanager)  # type: ignore
-                )
-            else:
-                e.page.go("/")
+        if len(self.sbmanager.auth.admin.list_users()) == 0:
+            self._set_route(e, "/first", "==")
+        elif self.sbmanager.session:
+            self._set_route(e, "/login", "!=", "/")
         else:
-            if e.route == "/login":
-                e.page.views.append(
-                    ROUTES.get("/login", PageNotFoundView)(e.page, self.sbmanager)  # type: ignore
-                )
-            else:
-                e.page.go("/login")
-
+            self._set_route(e, "/login", "==")
         e.page.update()
