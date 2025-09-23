@@ -6,6 +6,7 @@ from ui.router import Router
 
 def main(page: ft.Page) -> None:
     page.scroll = ft.ScrollMode.ADAPTIVE
+    page.theme = ft.Theme(color_scheme_seed="#53B551")
 
     Router(page, SupabaseManager(page))
 
