@@ -71,17 +71,20 @@ class SupabaseManager:
 
     # ---------------------------- Auth Methods ----------------------------
     def sign_up(
-        self, email: str, username: str, display_name: str, role: Role
+        self,
+        email: str,
+        username: str,
+        display_name: str,
+        role: Role,
+        password: str | None = None,
     ) -> Response:
         users = self.auth.admin.list_users()
         if any(user.email == email for user in users):
             return Response("error", "Email already exists")
         if any(user.user_metadata.get("username") == username for user in users):
             return Response("error", "Username already exists")
-
-        response = self.auth.sign_up(
-            {"email": email, "password": self.default_password}
-        )
+        password = password if password else self.default_password
+        response = self.auth.sign_up({"email": email, "password": password})
         if response.user:
             self.update_user(
                 response.user.id,
