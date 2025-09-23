@@ -13,10 +13,10 @@ class HomeView(ft.View):
         self.page: ft.Page = page
         self.sbmanager: SupabaseManager = sbmanager
 
-        self.__init__config()
+        self.__init__config__()
         self.__init_components__()
 
-    def __init__config(self) -> None:
+    def __init__config__(self) -> None:
         self.vertical_alignment = ft.MainAxisAlignment.CENTER
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         self.padding = 0
