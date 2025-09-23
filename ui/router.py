@@ -43,6 +43,9 @@ class Router:
 
     def on_route_change(self, e: ft.RouteChangeEvent) -> None:
         e.page.views.clear()
+        if len(self.sbmanager.auth.admin.list_users()) >= 1 and e.route == "/first":
+            e.page.go("/")
+
         if len(self.sbmanager.auth.admin.list_users()) == 0:
             self._set_route(e, "/first", "==")
         elif self.sbmanager.session:
