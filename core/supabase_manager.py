@@ -78,60 +78,83 @@ class SupabaseManager:
         role: Role,
         password: str | None = None,
     ) -> Response:
-        users = self.auth.admin.list_users()
-        if any(user.email == email for user in users):
-            return Response("error", "Email already exists")
-        if any(user.user_metadata.get("username") == username for user in users):
-            return Response("error", "Username already exists")
         password = password if password else self.default_password
-        response = self.auth.sign_up({"email": email, "password": password})
-        if response.user:
-            self.update_user(
-                response.user.id,
-                {
-                    "username": username,
-                    "display_name": display_name,
-                    "role": role,
-                },
-            )
-        return Response("success", "User registered successfully")
+        try:
+            response = self.auth.sign_up({"email": email, "password": password})
+            if response.user:
+                try:
+                    self.table("users").insert(
+                        {
+                            "id": response.user.id,
+                            "email": email,
+                            "username": username,
+                            "display_name": display_name,
+                            "role": role,
+                        }
+                    ).execute()
+                except:
+                    pass
+
+                return Response(
+                    "success",
+                    "User registered successfully. Please check your email to confirm your account.",
+                )
+            else:
+                return Response("error", "User registration failed")
+
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "already registered" in error_msg or "already exists" in error_msg:
+                return Response("error", "Email already registered")
+            elif "weak password" in error_msg:
+                return Response("error", "Password is too weak")
+            elif "invalid email" in error_msg:
+                return Response("error", "Invalid email format")
+            else:
+                return Response("error", f"Registration failed: {str(e)}")
 
     def sign_in(self, email_or_username: str, password: str) -> Response:
-        if is_email(email_or_username):
-            try:
-                user = next(
-                    user
-                    for user in self.auth.admin.list_users()
-                    if user.email == email_or_username
-                )
-            except:
-                return Response("error", "Email not found")
-        else:
-            try:
-                user = next(
-                    (
-                        user
-                        for user in self.auth.admin.list_users()
-                        if user.user_metadata.get("username") == email_or_username
-                    )
-                )
-            except:
-                return Response("error", "Username not found")
-
-        if not user.email_confirmed_at:
-            return Response("error", "Email not confirmed")
-
         try:
-            self.auth.sign_in_with_password(
-                {"email": user.email or "", "password": password}
-            )
-            self._save_current_session()
-            return Response(
-                "success",
-                f"Welcome back {user.user_metadata.get('display_name')}!",
-            )
-        except:
-            return Response("error", "Incorrect password")
+            if is_email(email_or_username):
+                self.auth.sign_in_with_password(
+                    {"email": email_or_username, "password": password}
+                )
+                self._save_current_session()
+                return Response(
+                    "success",
+                    f"Welcome back!",
+                )
+            else:
+                try:
+                    users_response = (
+                        self.table("users")
+                        .select("email")
+                        .eq("username", email_or_username)
+                        .execute()
+                    )
+                    if not users_response.data:
+                        return Response("error", "Username not found")
+
+                    email = users_response.data[0]["email"]
+                    self.auth.sign_in_with_password(
+                        {"email": email, "password": password}
+                    )
+                    self._save_current_session()
+                    return Response(
+                        "success",
+                        f"Welcome back!",
+                    )
+                except Exception as e:
+                    return Response("error", "Please use your email address to sign in")
+
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "invalid login credentials" in error_msg:
+                return Response("error", "Invalid email or password")
+            elif "email not confirmed" in error_msg:
+                return Response("error", "Please confirm your email address")
+            else:
+                return Response("error", "Sign in failed. Please try again.")
 
     def sign_out(self) -> Response:
         try:
@@ -146,15 +169,15 @@ class SupabaseManager:
         try:
             self.auth.admin.update_user_by_id(user_id, {"password": new_password})
             return Response("success", "Password updated successfully")
-        except:
-            return Response("error", "Failed to update password")
+        except Exception as e:
+            return Response("error", f"Failed to update password: {str(e)}")
 
     def update_user(self, user_id: str, metadata: DataDict) -> Response:
         try:
-            self.auth.admin.update_user_by_id(user_id, {"user_metadata": metadata})
+            self.table("users").update(metadata).eq("id", user_id).execute()
             return Response("success", "User updated successfully")
-        except:
-            return Response("error", "Failed to update user")
+        except Exception as e:
+            return Response("error", f"Failed to update user: {str(e)}")
 
     # ---------------------------- CRUD Operations ----------------------------
     def insert(self, table: str, data: DataDict) -> Response:
@@ -194,6 +217,13 @@ class SupabaseManager:
             return Response("error", "Failed to clear table data")
 
     # ---------------------------- Helper Methods ----------------------------
+    def has_users(self) -> bool:
+        try:
+            response = self.table("users").select("id").limit(1).execute()
+            return len(response.data) > 0 if response.data else False
+        except:
+            return False
+
     def set_default_password(self, password: str) -> Response:
         res = self.table("default_password").upsert({"password": password}).execute()
         if res.model_dump()["type"] != "success":

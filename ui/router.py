@@ -43,23 +43,25 @@ class Router:
             e.page.go(route)
 
     def on_connect(self, e: ft.ControlEvent) -> None:
-        if (
-            len(self.sbmanager.auth.admin.list_users()) == 0
-            and e.page.route != "/first"
-        ):
+        if not self.sbmanager.has_users() and e.page.route != "/first":
             e.page.go("/first")
         elif not self.sbmanager.session and e.page.route != "/login":
             e.page.go("/login")
 
     def on_route_change(self, e: ft.RouteChangeEvent) -> None:
         e.page.views.clear()
-        if len(self.sbmanager.auth.admin.list_users()) >= 1 and e.route == "/first":
-            e.page.go("/")
+        if self.sbmanager.has_users() and e.route == "/first":
+            return e.page.go("/")
 
-        if len(self.sbmanager.auth.admin.list_users()) == 0:
+        if not self.sbmanager.has_users():
             self._set_route(e, "/first", "==")
         elif self.sbmanager.session:
-            self._set_route(e, "/login", "!=", "/")
+            if e.route == "/login":
+                e.page.go("/")
+            else:
+                e.page.views.append(
+                    ROUTES.get(e.route, PageNotFoundView)(e.page, self.sbmanager)  # type: ignore
+                )
         else:
             self._set_route(e, "/login", "==")
         e.page.update()
