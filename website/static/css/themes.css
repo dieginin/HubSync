@@ -228,4 +228,18 @@ button,
     outline: none;
 }
 
+/* Responsive form container - Center with offset on desktop, normal on mobile */
+.form-container {
+    margin-top: -30px;
+    /* Small offset for mobile */
+}
+
+/* Only apply larger offset on screens larger than mobile */
+@media (min-width: 768px) {
+    .form-container {
+        margin-top: -112px;
+        /* Larger offset for desktop */
+    }
+}
+
 /* Custom PWA manifest theme-color meta tag will be handled by JavaScript */
