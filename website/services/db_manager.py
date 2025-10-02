@@ -3,7 +3,7 @@ from supabase import create_client
 from supabase_auth import Session
 
 from config import INITIAL_PASSWORD, SUPABASE_KEY, SUPABASE_URL
-from website.models import Response, User
+from website.models import Response
 from website.utils import DataDict, Role, is_email
 
 
@@ -31,7 +31,7 @@ class DatabaseManager:
         display_name: str,
         password: str = INITIAL_PASSWORD,
         role: Role = "user",
-    ) -> Response[User]:
+    ) -> Response:
         if self.get_user_by_eq("email", email):
             return Response(type="error", message="Email already exists")
         if self.get_user_by_eq("username", username):
@@ -51,7 +51,6 @@ class DatabaseManager:
                 return Response(
                     "success",
                     f"User registered successfully. Please check {email} to confirm the account",
-                    User(**user_data),
                 )
             return Response("error", "User registration failed")
         except Exception as e:
