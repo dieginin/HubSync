@@ -14,7 +14,7 @@
     --bs-dark: #2d3436;
 
     /* Custom variables - Naturaleza */
-    --navbar-bg: #f8fffe;
+    --navbar-bg: #f5f7f8;
     --navbar-color: #2d3436;
     --card-bg: #ffffff;
     --border-color: #dfe6e9;
@@ -58,6 +58,7 @@ body {
 .navbar {
     background-color: var(--navbar-bg) !important;
     border-color: var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .navbar .navbar-nav .nav-link {
@@ -66,6 +67,12 @@ body {
 
 .navbar .navbar-nav .nav-link:hover {
     color: var(--bs-primary) !important;
+}
+
+.navbar .navbar-nav .nav-link.active {
+    color: var(--bs-primary) !important;
+    font-weight: 600;
+    position: relative;
 }
 
 .navbar-toggler {
