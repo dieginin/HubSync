@@ -1,13 +1,13 @@
 {
+    "id": "hubsync-pwa",
     "name": "HubSync",
     "short_name": "HubSync",
     "description": "Carefree Cultivations gestion PWA",
+    "scope": "/",
     "start_url": "/",
     "display": "standalone",
     "orientation": "natural",
     "prefer_related_applications": false,
-    "background_color": "#ffffff",
-    "theme_color": "#0d6efd",
     "icons": [
         {
             "src": "/static/images/web-app-manifest-192x192.png",
@@ -21,5 +21,9 @@
             "type": "image/png",
             "purpose": "maskable"
         }
+    ],
+    "categories": [
+        "productivity",
+        "business"
     ]
 }
