@@ -8,6 +8,21 @@ from config import SECRET_KEY
 
 
 def login_required(f):
+    from website import db
+
+    def set_user(user_id: str) -> None:
+        from website.models import User
+
+        user_data = db.get_user_by_eq("id", user_id)
+        if user_data:
+            g.user = User(
+                id=user_data[0]["id"],
+                email=user_data[0]["email"],
+                username=user_data[0]["username"],
+                display_name=user_data[0]["display_name"],
+                role=user_data[0]["role"],
+            )
+
     @wraps(f)
     def decorated_function(*args, **kwargs) -> Response | str:
         access_token = request.cookies.get("access_token")
@@ -23,13 +38,12 @@ def login_required(f):
                 payload = None
             except:
                 return redirect(url_for("auth.login"))
-        if not payload and refresh_token:
-            from website import db
 
+        if not payload and refresh_token:
             resp = db.refresh_session(refresh_token)
             if resp.type == "success" and resp.data:
                 new_access_token = jwt.encode(
-                    {"access_token": resp.data.access_token},
+                    {"user_id": resp.data.user.id},
                     SECRET_KEY,
                     algorithm="HS256",
                 )
@@ -49,11 +63,15 @@ def login_required(f):
                     samesite="Lax",
                     max_age=30 * 24 * 3600,
                 )
-                g.user = resp.message
+                set_user(resp.data.user.id)
                 return response
             else:
                 return redirect(url_for("auth.login"))
-        g.user = payload
+
+        if payload and "user_id" in payload:
+            set_user(payload["user_id"])
+        else:
+            return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
 
     return decorated_function
@@ -78,6 +96,8 @@ def login_only_if_configured(f):
 
         if not db.users_exist:
             return redirect(url_for("auth.first_setup"))
+        if request.cookies.get("access_token"):
+            return redirect(url_for("views.home"))
         return f(*args, **kwargs)
 
     return decorated_function

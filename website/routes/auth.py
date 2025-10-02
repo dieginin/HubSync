@@ -69,7 +69,7 @@ def login() -> Response | str:
             if response.type == "success" and response.data:
                 flash(response.message, category="success")
                 access_token = jwt.encode(
-                    {"access_token": response.data.access_token},
+                    {"user_id": response.data.user.id},
                     SECRET_KEY,
                     algorithm="HS256",
                 )
