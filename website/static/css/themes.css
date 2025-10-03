@@ -75,6 +75,50 @@ body {
     position: relative;
 }
 
+/* Offcanvas navigation active states */
+.offcanvas-title {
+    color: var(--bs-primary) !important;
+    font-weight: 600;
+}
+
+.offcanvas .nav-pills .nav-link {
+    color: var(--navbar-color) !important;
+    background-color: transparent;
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+}
+
+.offcanvas .nav-pills .nav-link.active {
+    background-color: var(--bs-primary);
+    color: white !important;
+}
+
+.offcanvas .nav-pills .nav-link:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary) !important;
+}
+
+/* Top navbar user info and logout styles */
+.navbar .navbar-text {
+    color: var(--navbar-color) !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link.text-danger {
+    color: var(--bs-danger) !important;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.navbar .nav-link.text-danger:hover {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger) !important;
+    transform: translateY(-1px);
+}
+
 .navbar-toggler {
     border-color: var(--border-color);
 }

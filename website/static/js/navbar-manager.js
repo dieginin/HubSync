@@ -1,6 +1,6 @@
 /**
  * Navbar Active State Manager
- * Manages the active state of navbar links
+ * Manages the active state of navigation links in offcanvas
  */
 
 class NavbarManager {
@@ -12,7 +12,7 @@ class NavbarManager {
         // Set active link based on current URL when page loads
         this.setActiveLinkFromURL();
 
-        // Add click handlers to navbar links
+        // Add click handlers to navigation links
         this.attachClickHandlers();
     }
 
@@ -21,7 +21,7 @@ class NavbarManager {
      */
     setActiveLinkFromURL() {
         const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        const navLinks = document.querySelectorAll('.offcanvas .nav-pills .nav-link');
 
         navLinks.forEach(link => {
             link.classList.remove('active');
@@ -36,8 +36,8 @@ class NavbarManager {
 
         // Special case for home page - if no match found and we're at root
         if (currentPath === '/' || currentPath === '') {
-            const homeLink = document.querySelector('.navbar-nav .nav-link[href="/"]');
-            if (homeLink && !document.querySelector('.navbar-nav .nav-link.active')) {
+            const homeLink = document.querySelector('.offcanvas .nav-pills .nav-link[href="/"]');
+            if (homeLink && !document.querySelector('.offcanvas .nav-pills .nav-link.active')) {
                 this.setActiveLink(homeLink);
             }
         }
@@ -48,8 +48,8 @@ class NavbarManager {
      * @param {HTMLElement} activeLink - The link element to set as active
      */
     setActiveLink(activeLink) {
-        // Remove active class from all navbar links
-        document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+        // Remove active class from all navigation links in offcanvas
+        document.querySelectorAll('.offcanvas .nav-pills .nav-link').forEach(link => {
             link.classList.remove('active');
             link.removeAttribute('aria-current');
         });
@@ -60,13 +60,13 @@ class NavbarManager {
     }
 
     /**
-     * Attach click handlers to navbar links
+     * Attach click handlers to navigation links
      */
     attachClickHandlers() {
-        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        const navLinks = document.querySelectorAll('.offcanvas .nav-pills .nav-link');
 
         navLinks.forEach(link => {
-            // Skip logout link as it doesn't need active state
+            // Skip logout link as it doesn't need active state (it's not in offcanvas anymore)
             if (link.getAttribute('href') === '/logout') {
                 return;
             }
@@ -77,6 +77,12 @@ class NavbarManager {
 
                 // Store the active link in sessionStorage for persistence
                 sessionStorage.setItem('activeNavLink', link.getAttribute('href'));
+
+                // Close offcanvas after clicking a link (optional)
+                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('navigationOffcanvas'));
+                if (offcanvas) {
+                    offcanvas.hide();
+                }
             });
         });
     }
@@ -87,7 +93,7 @@ class NavbarManager {
     restoreActiveState() {
         const storedActiveLink = sessionStorage.getItem('activeNavLink');
         if (storedActiveLink) {
-            const link = document.querySelector(`.navbar-nav .nav-link[href="${storedActiveLink}"]`);
+            const link = document.querySelector(`.offcanvas .nav-pills .nav-link[href="${storedActiveLink}"]`);
             if (link) {
                 this.setActiveLink(link);
             }
