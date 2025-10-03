@@ -1,4 +1,3 @@
-import jwt
 from flask import (
     Blueprint,
     flash,
@@ -10,7 +9,6 @@ from flask import (
 )
 from werkzeug import Response
 
-from config import SECRET_KEY
 from website import db
 from website.utils import first_setup_only, login_only_if_configured, login_required
 
@@ -68,11 +66,7 @@ def login() -> Response | str:
             response = db.login(email_or_username=email_or_username, password=password)
             if response.type == "success" and response.data:
                 flash(response.message, category="success")
-                access_token = jwt.encode(
-                    {"user_id": response.data.user.id},
-                    SECRET_KEY,
-                    algorithm="HS256",
-                )
+                access_token = response.data.access_token
                 refresh_token = response.data.refresh_token
                 res = make_response(redirect(url_for("views.home")))
                 res.set_cookie(

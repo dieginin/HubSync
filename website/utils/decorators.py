@@ -1,14 +1,19 @@
 from functools import wraps
 
-import jwt
 from flask import g, make_response, redirect, request, url_for
 from werkzeug import Response
-
-from config import SECRET_KEY
 
 
 def login_required(f):
     from website import db
+
+    def is_token_expiring_soon(expires_at: int, threshold_minutes: int = 5) -> bool:
+        import time
+
+        current_time = int(time.time())
+        threshold_seconds = threshold_minutes * 60
+        time_until_expiry = expires_at - current_time
+        return time_until_expiry <= threshold_seconds and time_until_expiry > 0
 
     def set_user(user_id: str) -> None:
         from website.models import User
@@ -23,70 +28,109 @@ def login_required(f):
                 role=user_data[0]["role"],
             )
 
+    def set_new_cookies(
+        response: Response, access_token: str, refresh_token: str
+    ) -> None:
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            samesite="Lax",
+            max_age=7 * 24 * 3600,  # 7 días
+        )
+        response.set_cookie(
+            "refresh_token",
+            refresh_token,
+            httponly=True,
+            samesite="Lax",
+            max_age=30 * 24 * 3600,  # 30 días
+        )
+
+    def clear_cookies_and_redirect() -> Response:
+        response = make_response(redirect(url_for("auth.login")))
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+        return response
+
     @wraps(f)
     def decorated_function(*args, **kwargs) -> Response | str:
         access_token = request.cookies.get("access_token")
         refresh_token = request.cookies.get("refresh_token")
         if not access_token and not refresh_token:
-            return redirect(url_for("auth.login"))
+            return clear_cookies_and_redirect()
 
         payload = None
-        if access_token:
+        if access_token and refresh_token:
             try:
-                payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
-            except jwt.ExpiredSignatureError:
-                payload = None
+                if db.set_session_from_tokens(access_token, refresh_token):
+                    user_response = db.auth.get_user()
+                    if user_response and user_response.user:
+                        payload = {"user_id": user_response.user.id}
+
+                        try:
+                            current_session = db.auth.get_session()
+                            if (
+                                current_session
+                                and hasattr(current_session, "expires_at")
+                                and current_session.expires_at is not None
+                            ):
+                                if is_token_expiring_soon(
+                                    current_session.expires_at, threshold_minutes=5
+                                ):
+                                    refresh_response = db.refresh_session(refresh_token)
+
+                                    if (
+                                        refresh_response.type == "success"
+                                        and refresh_response.data
+                                    ):
+                                        new_access_token = (
+                                            refresh_response.data.access_token
+                                        )
+                                        new_refresh_token = (
+                                            refresh_response.data.refresh_token
+                                        )
+
+                                        db.set_session_from_tokens(
+                                            new_access_token, new_refresh_token
+                                        )
+
+                                        response = make_response(f(*args, **kwargs))
+                                        set_new_cookies(
+                                            response,
+                                            new_access_token,
+                                            new_refresh_token,
+                                        )
+
+                                        set_user(payload["user_id"])
+                                        return response
+                        except:
+                            ...
             except:
-                response = make_response(redirect(url_for("auth.login")))
-                response.delete_cookie("access_token")
-                response.delete_cookie("refresh_token")
-                return response
+                payload = None
 
         if not payload and refresh_token:
-            resp = db.refresh_session(refresh_token)
-            if resp.type == "success" and resp.data:
-                new_access_token = jwt.encode(
-                    {"user_id": resp.data.user.id},
-                    SECRET_KEY,
-                    algorithm="HS256",
-                )
-                new_refresh_token = resp.data.refresh_token
-                response = make_response()
-                response.set_cookie(
-                    "access_token",
-                    new_access_token,
-                    httponly=True,
-                    samesite="Lax",
-                    max_age=7 * 24 * 3600,
-                )
-                response.set_cookie(
-                    "refresh_token",
-                    new_refresh_token,
-                    httponly=True,
-                    samesite="Lax",
-                    max_age=30 * 24 * 3600,
-                )
-                set_user(resp.data.user.id)
-                # Set the Supabase session with the new tokens
+            refresh_response = db.refresh_session(refresh_token)
+            if refresh_response.type == "success" and refresh_response.data:
+                new_access_token = refresh_response.data.access_token
+                new_refresh_token = refresh_response.data.refresh_token
+
+                response = make_response(redirect(request.url))
+                set_new_cookies(response, new_access_token, new_refresh_token)
+
                 try:
                     db.set_session_from_tokens(new_access_token, new_refresh_token)
                 except Exception as e:
                     print(f"Warning: Could not set Supabase session after refresh: {e}")
+
                 return response
             else:
-                return redirect(url_for("auth.login"))
+                return clear_cookies_and_redirect()
 
         if payload and "user_id" in payload:
             set_user(payload["user_id"])
-            # Also set the Supabase session if we have tokens
-            if access_token and refresh_token:
-                try:
-                    db.set_session_from_tokens(access_token, refresh_token)
-                except Exception as e:
-                    print(f"Warning: Could not set Supabase session: {e}")
+            return f(*args, **kwargs)
         else:
-            return redirect(url_for("auth.login"))
-        return f(*args, **kwargs)
+            return clear_cookies_and_redirect()
 
     return decorated_function
 
