@@ -13,12 +13,13 @@
         <div class="form-group">
             <label for="email_or_username">Email or Username</label>
             <input type="text" class="form-control" id="email_or_username" name="email_or_username"
-                placeholder="Enter your email or username" required>
+                placeholder="Enter your email or username" required
+                oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"
-                required>
+                required oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <button type="submit" class="btn btn-primary mt-3 mx-auto d-block">Log In</button>
     </form>

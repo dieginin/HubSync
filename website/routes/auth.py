@@ -21,7 +21,7 @@ auth = Blueprint("auth", __name__)
 @first_setup_only
 def first_setup() -> Response | str:
     if request.method == "POST":
-        name = request.form.get("name", "")
+        name = request.form.get("name", "").strip()
         email = request.form.get("email", "")
         username = request.form.get("username", "")
         password = request.form.get("password1", "")

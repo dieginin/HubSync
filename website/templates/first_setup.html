@@ -19,22 +19,23 @@
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required
+                oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter a username"
-                required>
+                required oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <div class="form-group">
             <label for="password1">Password</label>
             <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter a password"
-                required>
+                required oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <div class="form-group">
             <label for="password2">Confirm Password</label>
             <input type="password" class="form-control" id="password2" name="password2"
-                placeholder="Confirm your password" required>
+                placeholder="Confirm your password" required oninput="this.value = this.value.replace(/\s/g, '')">
         </div>
         <button type="submit" class="btn btn-primary mt-3 mx-auto d-block">Set Up Account</button>
     </form>
