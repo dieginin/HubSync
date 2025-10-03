@@ -28,9 +28,9 @@ class ThemeManager {
             }
         });
 
-        // Listen for storage changes (for cross-tab synchronization)
+        // Listen for storage changes (for cross-tab synchronization with localStorage)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'hubsync-theme') {
+            if (e.key === 'theme_preference') {
                 this.currentTheme = e.newValue || this.themes.auto;
                 this.applyTheme();
             }
@@ -39,7 +39,8 @@ class ThemeManager {
 
     getStoredTheme() {
         try {
-            return localStorage.getItem('hubsync-theme');
+            // Read from localStorage
+            return localStorage.getItem('theme_preference');
         } catch {
             return null;
         }
@@ -48,9 +49,11 @@ class ThemeManager {
     setStoredTheme(theme) {
         try {
             if (theme === this.themes.auto) {
-                localStorage.removeItem('hubsync-theme');
+                // Remove from localStorage if auto
+                localStorage.removeItem('theme_preference');
             } else {
-                localStorage.setItem('hubsync-theme', theme);
+                // Store in localStorage
+                localStorage.setItem('theme_preference', theme);
             }
         } catch {
             // Silently handle localStorage errors

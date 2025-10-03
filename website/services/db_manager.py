@@ -1,3 +1,5 @@
+from typing import Optional
+
 from postgrest import SyncRequestBuilder
 from supabase import create_client
 from supabase_auth import Session
@@ -12,6 +14,16 @@ class DatabaseManager:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         self.auth = supabase.auth
         self.table = supabase.table
+
+    def set_session_from_tokens(self, access_token: str, refresh_token: str) -> bool:
+        """Set the Supabase session using tokens, useful after page reload"""
+        try:
+            # Try to set the session using the tokens directly
+            self.auth.set_session(access_token, refresh_token)
+            return True
+        except Exception as e:
+            print(f"Could not set session from tokens: {e}")
+            return False
 
     @property
     def users_table(self) -> SyncRequestBuilder[DataDict]:
@@ -105,3 +117,89 @@ class DatabaseManager:
             return Response("success", "Session closed successfully")
         except Exception as e:
             return Response("error", str(e))
+
+    def update_user_profile(
+        self,
+        user_id: str,
+        email: Optional[str] = None,
+        username: Optional[str] = None,
+        display_name: Optional[str] = None,
+    ) -> Response:
+        try:
+            if email:
+                existing_email_user = self.get_user_by_eq("email", email)
+                if existing_email_user and existing_email_user[0]["id"] != user_id:
+                    return Response(type="error", message="Email already exists")
+
+            if username:
+                existing_username_user = self.get_user_by_eq("username", username)
+                if (
+                    existing_username_user
+                    and existing_username_user[0]["id"] != user_id
+                ):
+                    return Response(type="error", message="Username already exists")
+
+            update_data: DataDict = {}
+            old_email = self.get_user_by_eq("id", user_id)[0]["email"]
+            if email is not None:
+                update_data["email"] = email
+            if username is not None:
+                update_data["username"] = username
+            if display_name is not None:
+                update_data["display_name"] = display_name
+
+            self.users_table.update(update_data).eq("id", user_id).execute()
+
+            # Only try to update auth email if email is being changed and we have an active session
+            if email and email != old_email:
+                try:
+                    # Check if we have an active session, if not skip auth update
+                    current_session = self.auth.get_session()
+                    if current_session and current_session.access_token:
+                        self.auth.update_user({"email": email})
+                    # If no active session, we still update the database but skip auth update
+                    # The auth email will be updated next time user logs in
+                except Exception as auth_error:
+                    auth_error_msg = str(auth_error)
+                    # If it's just a missing session, don't revert - this is expected after page reload
+                    if (
+                        "Auth session missing" in auth_error_msg
+                        or "session" in auth_error_msg.lower()
+                    ):
+                        # Just log this but don't fail the entire update
+                        print(
+                            f"Warning: Could not update auth email due to missing session: {auth_error_msg}"
+                        )
+                    else:
+                        # For other auth errors, revert database changes
+                        self.users_table.update({"email": old_email}).eq(
+                            "id", user_id
+                        ).execute()
+                        return Response(
+                            type="error",
+                            message=f"Failed to update email in authentication system: {str(auth_error)}",
+                        )
+
+            return Response("success", "Profile updated successfully")
+        except Exception as e:
+            return Response("error", str(e))
+
+    def change_password(
+        self, current_password: str, new_password: str, email: str
+    ) -> Response:
+        try:
+            try:
+                self.auth.sign_in_with_password(
+                    {"email": email, "password": current_password}
+                )
+            except Exception:
+                return Response("error", "Current password is incorrect")
+
+            self.auth.update_user({"password": new_password})
+            return Response("success", "Password changed successfully")
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "weak password" in error_msg or "password" in error_msg:
+                return Response("error", "New password is too weak")
+            else:
+                return Response("error", str(e))

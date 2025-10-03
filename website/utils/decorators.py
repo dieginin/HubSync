@@ -67,12 +67,23 @@ def login_required(f):
                     max_age=30 * 24 * 3600,
                 )
                 set_user(resp.data.user.id)
+                # Set the Supabase session with the new tokens
+                try:
+                    db.set_session_from_tokens(new_access_token, new_refresh_token)
+                except Exception as e:
+                    print(f"Warning: Could not set Supabase session after refresh: {e}")
                 return response
             else:
                 return redirect(url_for("auth.login"))
 
         if payload and "user_id" in payload:
             set_user(payload["user_id"])
+            # Also set the Supabase session if we have tokens
+            if access_token and refresh_token:
+                try:
+                    db.set_session_from_tokens(access_token, refresh_token)
+                except Exception as e:
+                    print(f"Warning: Could not set Supabase session: {e}")
         else:
             return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
