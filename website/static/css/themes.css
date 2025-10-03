@@ -249,4 +249,33 @@ button,
     }
 }
 
+/* Password toggle button styles */
+.password-toggle-btn {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-left: none;
+    color: var(--text-muted);
+    border-radius: 0 var(--bs-border-radius) var(--bs-border-radius) 0;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.15s ease-in-out;
+    position: relative;
+}
+
+.password-toggle-btn:hover {
+    /* background-color: var(--bs-gray-50); */
+    color: var(--bs-primary);
+    /* border-color: var(--bs-border-color); */
+}
+
+/* Input group focus state */
+.input-group:focus-within .password-toggle-btn {
+    border-color: var(--bs-primary);
+}
+
+/* Make sure the input and button have same height */
+.input-group .form-control,
+.input-group .password-toggle-btn {
+    height: calc(2.25rem + 2px);
+}
+
 /* Custom PWA manifest theme-color meta tag will be handled by JavaScript */

@@ -68,7 +68,7 @@
                                 <input type="password" class="form-control" id="current_password"
                                     name="current_password" required minlength="3"
                                     oninput="this.value = this.value.replace(/\s/g, '')">
-                                <button type="button" class="btn btn-outline-secondary" data-password-toggle
+                                <button type="button" class="password-toggle-btn" data-password-toggle
                                     onclick="togglePasswordVisibility('current_password', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -81,7 +81,7 @@
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="new_password" name="new_password"
                                         required minlength="3" oninput="this.value = this.value.replace(/\s/g, '')">
-                                    <button type="button" class="btn btn-outline-secondary" data-password-toggle
+                                    <button type="button" class="password-toggle-btn" data-password-toggle
                                         onclick="togglePasswordVisibility('new_password', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
@@ -93,7 +93,7 @@
                                     <input type="password" class="form-control" id="confirm_password"
                                         name="confirm_password" required minlength="3"
                                         oninput="this.value = this.value.replace(/\s/g, '')">
-                                    <button type="button" class="btn btn-outline-secondary" data-password-toggle
+                                    <button type="button" class="password-toggle-btn" data-password-toggle
                                         onclick="togglePasswordVisibility('confirm_password', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
