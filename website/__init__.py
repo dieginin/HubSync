@@ -1,4 +1,4 @@
-from flask import Flask, Response, send_from_directory
+from flask import Flask
 
 from config import SECRET_KEY
 from website.services import DatabaseManager
