@@ -37,7 +37,10 @@ def login_required(f):
             except jwt.ExpiredSignatureError:
                 payload = None
             except:
-                return redirect(url_for("auth.login"))
+                response = make_response(redirect(url_for("auth.login")))
+                response.delete_cookie("access_token")
+                response.delete_cookie("refresh_token")
+                return response
 
         if not payload and refresh_token:
             resp = db.refresh_session(refresh_token)
