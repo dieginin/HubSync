@@ -40,7 +40,8 @@
                     {{ current_user.display_name }}
                     {% endif %}
                 </span>
-                <a class="nav-link text-danger d-flex align-items-center" href="/logout" title="Logout">
+                <a class="nav-link text-danger d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+                    title="Logout">
                     <i class="bi bi-box-arrow-right me-1"></i>
                     <span class="d-none d-md-inline">Logout</span>
                 </a>
@@ -53,10 +54,11 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="d-flex flex-column h-100">
+
                         <!-- Main navigation -->
                         <ul class="nav nav-pills flex-column mb-auto">
                             <li class="nav-item">
-                                <a class="nav-link active" href="/">
+                                <a class="nav-link active" href="{{ url_for('main.home') }}">
                                     <i class="bi bi-house me-2"></i>Home
                                 </a>
                             </li>
@@ -66,7 +68,7 @@
                         <hr>
                         <ul class="nav nav-pills flex-column">
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" href="{{ url_for('main.settings') }}">
                                     <i class="bi bi-gear-fill me-2"></i>Settings
                                 </a>
                             </li>
@@ -98,9 +100,8 @@
     <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme-manager.js') }}"></script>
     <script>
-        // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/static/js/service-worker.js')
+            navigator.serviceWorker.register('{{ url_for("static", filename="js/service-worker.js") }}')
                 .then(() => console.log('Service Worker registered'))
                 .catch((error) => console.error('Service Worker registration failed:', error));
         }
