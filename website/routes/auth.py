@@ -7,6 +7,12 @@ from werkzeug import Response
 from werkzeug.security import check_password_hash
 
 from website import db
+from website.config import (
+    MIN_EMAIL_LENGTH,
+    MIN_NAME_LENGTH,
+    MIN_PASSWORD_LENGTH,
+    MIN_USERNAME_LENGTH,
+)
 from website.models import User
 from website.utils import first_setup_only, login_only_if_configured
 
@@ -32,14 +38,23 @@ def first_setup() -> Response | str:
             flash("Email already exists", category="danger")
         elif user_exists:
             flash("Username already exists", category="danger")
-        elif len(name) < 2:
-            flash("Name must be at least 2 characters long", category="danger")
-        elif len(email) < 5:
-            flash("Please enter a valid email address", category="danger")
-        elif len(username) < 2:
-            flash("Username must be at least 2 characters long", category="danger")
-        elif len(password) < 3:
-            flash("Password must be at least 3 characters long", category="danger")
+        elif len(name) < MIN_NAME_LENGTH:
+            flash(
+                f"Name must be at least {MIN_NAME_LENGTH} characters long",
+                category="danger",
+            )
+        elif len(email) < MIN_EMAIL_LENGTH:
+            flash(f"Please enter a valid email address", category="danger")
+        elif len(username) < MIN_USERNAME_LENGTH:
+            flash(
+                f"Username must be at least {MIN_USERNAME_LENGTH} characters long",
+                category="danger",
+            )
+        elif len(password) < MIN_PASSWORD_LENGTH:
+            flash(
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters long",
+                category="danger",
+            )
         elif password != password2:
             flash("Passwords don't match", category="danger")
         else:
