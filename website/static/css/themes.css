@@ -1,0 +1,358 @@
+/* Light theme (default) */
+:root {
+    /* Bootstrap color overrides */
+    --bs-body-bg: #fafffe;
+    --bs-body-color: #2d3436;
+    --bs-primary: #248939;
+    --bs-secondary: #74b9ff;
+    --bs-success: #00cec9;
+    --bs-info: #81ecec;
+    --bs-warning: #fdcb6e;
+    --bs-danger: #e84393;
+    --bs-light: #f1f2f6;
+    --bs-dark: #2d3436;
+
+    /* Custom component colors */
+    --navbar-bg: #f5f7f8;
+    --navbar-color: #2d3436;
+    --card-bg: #ffffff;
+    --border-color: #dfe6e9;
+    --shadow: rgba(36, 137, 57, 0.15);
+    --input-bg: #ffffff;
+    --input-border: #b2dfdb;
+    --text-muted: #636e72;
+}
+
+/* Dark theme */
+[data-bs-theme="dark"] {
+    /* Bootstrap color overrides */
+    --bs-body-bg: #1e2d2f;
+    --bs-body-color: #e8f5f3;
+    --bs-primary: #4caf50;
+    --bs-secondary: #74b9ff;
+    --bs-success: #55efc4;
+    --bs-info: #81ecec;
+    --bs-warning: #fdcb6e;
+    --bs-danger: #fd79a8;
+    --bs-light: #2d3e40;
+    --bs-dark: #e8f5f3;
+
+    /* Custom component colors */
+    --navbar-bg: #263238;
+    --navbar-color: #e8f5f3;
+    --card-bg: #2d3e40;
+    --border-color: #37474f;
+    --shadow: rgba(76, 175, 80, 0.2);
+    --input-bg: #37474f;
+    --input-border: #455a64;
+    --text-muted: #b0bec5;
+}
+
+/* ----- BASE STYLES & GLOBAL ELEMENTS ----- */
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Global transition classes */
+.theme-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for all interactive elements */
+a,
+button,
+.btn,
+.nav-link,
+.form-control {
+    transition: all 0.2s ease;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.alert {
+    border-color: var(--border-color);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: 0 0.125rem 0.25rem var(--shadow);
+}
+
+/* ----- NAVIGATION COMPONENTS ----- */
+/* Main navbar */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    border-color: var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar .navbar-nav .nav-link {
+    color: var(--navbar-color) !important;
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link.active {
+    color: var(--bs-primary) !important;
+}
+
+.navbar .navbar-nav .nav-link.active {
+    font-weight: 600;
+    position: relative;
+}
+
+.navbar .navbar-text {
+    color: var(--navbar-color) !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link.text-danger {
+    color: var(--bs-danger) !important;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.navbar .nav-link.text-danger:hover {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger) !important;
+    transform: translateY(-1px);
+}
+
+.navbar-toggler {
+    border-color: var(--border-color);
+}
+
+/* Offcanvas navigation */
+.offcanvas-title {
+    color: var(--bs-primary) !important;
+    font-weight: 600;
+}
+
+.offcanvas .nav-pills .nav-link {
+    color: var(--navbar-color) !important;
+    background-color: transparent;
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+}
+
+.offcanvas .nav-pills .nav-link.active {
+    background-color: var(--bs-primary);
+    color: white !important;
+}
+
+.offcanvas .nav-pills .nav-link:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary) !important;
+}
+
+/* ----- FORM CONTROLS ----- */
+.form-control {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--bs-body-color);
+}
+
+.form-control:focus {
+    background-color: var(--input-bg);
+    border-color: var(--bs-primary);
+    color: var(--bs-body-color);
+    box-shadow: 0 0 0 0.25rem rgba(36, 137, 57, 0.25);
+}
+
+/* Dark theme form control focus */
+[data-bs-theme="dark"] .form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* Password toggle functionality */
+.password-toggle-btn {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-left: none;
+    color: var(--text-muted);
+    border-radius: 0 var(--bs-border-radius) var(--bs-border-radius) 0;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.15s ease-in-out;
+    position: relative;
+}
+
+.password-toggle-btn:hover {
+    color: var(--bs-primary);
+}
+
+.input-group:focus-within .password-toggle-btn {
+    border-color: var(--bs-primary);
+}
+
+.input-group .form-control,
+.input-group .password-toggle-btn {
+    height: calc(2.25rem + 2px);
+}
+
+/* Form container responsive positioning */
+.form-container {
+    margin-top: -30px;
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        margin-top: -112px;
+    }
+}
+
+/* ----- THEME TOGGLE ----- */
+.theme-toggle {
+    background: transparent !important;
+    border: none;
+    color: var(--navbar-color);
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.theme-toggle:hover {
+    background: transparent !important;
+    color: var(--bs-primary);
+    transform: scale(1.2);
+}
+
+.theme-toggle:focus {
+    outline: none;
+    background: transparent !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* ----- BUTTON STYLES ----- */
+/* Base button behavior */
+.btn:focus {
+    outline: none;
+}
+
+.btn:active,
+.btn.active {
+    transform: translateY(0) !important;
+}
+
+.btn:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Primary buttons */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.btn-primary:focus {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    box-shadow: 0 0 0 0.25rem rgba(36, 137, 57, 0.25);
+}
+
+.btn-primary:active,
+.btn-primary:active:focus {
+    background-color: #155724 !important;
+    border-color: #155724 !important;
+    color: white !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+}
+
+/* Dark theme primary button adjustments */
+[data-bs-theme="dark"] .btn-primary:hover {
+    background-color: #66bb6a;
+    border-color: #66bb6a;
+}
+
+[data-bs-theme="dark"] .btn-primary:focus {
+    background-color: #66bb6a;
+    border-color: #66bb6a;
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+[data-bs-theme="dark"] .btn-primary:active,
+[data-bs-theme="dark"] .btn-primary:active:focus {
+    background-color: #43a047 !important;
+    border-color: #43a047 !important;
+    color: white !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+}
+
+/* Secondary buttons */
+.btn-secondary {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+.btn-secondary:hover {
+    background-color: #5a9bd4;
+    border-color: #5a9bd4;
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active,
+.btn-secondary:active:focus {
+    background-color: #4589c7 !important;
+    border-color: #4589c7 !important;
+    color: white !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+}
+
+/* Success buttons */
+.btn-success {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+
+.btn-success:hover {
+    background-color: #4de3a0;
+    border-color: #4de3a0;
+    transform: translateY(-1px);
+}
+
+.btn-success:active,
+.btn-success:active:focus {
+    background-color: #1dd1aa !important;
+    border-color: #1dd1aa !important;
+    color: white !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+}
+
+/* Outline buttons */
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary:active,
+.btn-outline-primary:active:focus {
+    background-color: #155724 !important;
+    border-color: #155724 !important;
+    color: white !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+}
