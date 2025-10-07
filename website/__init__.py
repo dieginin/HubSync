@@ -3,19 +3,10 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import DB_NAME, SECRET_KEY
+from .database import DatabaseManager
 
 db = SQLAlchemy()
-
-from .models import User
-
-
-def has_users_in_db() -> bool:
-    return db.session.query(User).first() is not None
-
-
-def _create_database(app: Flask) -> None:
-    with app.app_context():
-        db.create_all()
+db_manager = DatabaseManager(db)
 
 
 def create_app() -> Flask:
@@ -30,15 +21,17 @@ def create_app() -> Flask:
     login_manager.login_message = ""
     login_manager.init_app(app)
 
+    from .models import User
+
     @login_manager.user_loader
     def load_user(user_id: str) -> User | None:
-        return User.query.get(int(user_id))
+        return db_manager.get_user_by_id(int(user_id))
 
     from .routes import auth, main
 
     app.register_blueprint(auth, url_prefix="/")
     app.register_blueprint(main, url_prefix="/")
 
-    _create_database(app)
+    db_manager.create_tables(app)
 
     return app

@@ -6,14 +6,8 @@ from flask_login import login_required, login_user, logout_user
 from werkzeug import Response
 from werkzeug.security import check_password_hash
 
-from website import db
-from website.config import (
-    MIN_EMAIL_LENGTH,
-    MIN_NAME_LENGTH,
-    MIN_PASSWORD_LENGTH,
-    MIN_USERNAME_LENGTH,
-)
-from website.models import User
+from website import db_manager
+from website.config import MIN_LENGTHS
 from website.utils import first_setup_only, login_only_if_configured
 
 auth = _Blueprint("auth", __name__)
@@ -31,42 +25,40 @@ def first_setup() -> Response | str:
         password = request.form.get("password1", "")
         password2 = request.form.get("password2", "")
 
-        email_exists = User.query.filter(User.email == email).first()
-        user_exists = User.query.filter(User.username == username).first()
+        email_exists = db_manager.get_user_by_email(email) is not None
+        user_exists = db_manager.get_user_by_username(username) is not None
 
         if email_exists:
             flash("Email already exists", category="danger")
         elif user_exists:
             flash("Username already exists", category="danger")
-        elif len(name) < MIN_NAME_LENGTH:
+        elif len(name) < MIN_LENGTHS["name"]:
             flash(
-                f"Name must be at least {MIN_NAME_LENGTH} characters long",
+                f"Name must be at least {MIN_LENGTHS['name']} characters long",
                 category="danger",
             )
-        elif len(email) < MIN_EMAIL_LENGTH:
+        elif len(email) < MIN_LENGTHS["email"]:
             flash(f"Please enter a valid email address", category="danger")
-        elif len(username) < MIN_USERNAME_LENGTH:
+        elif len(username) < MIN_LENGTHS["username"]:
             flash(
-                f"Username must be at least {MIN_USERNAME_LENGTH} characters long",
+                f"Username must be at least {MIN_LENGTHS['username']} characters long",
                 category="danger",
             )
-        elif len(password) < MIN_PASSWORD_LENGTH:
+        elif len(password) < MIN_LENGTHS["password"]:
             flash(
-                f"Password must be at least {MIN_PASSWORD_LENGTH} characters long",
+                f"Password must be at least {MIN_LENGTHS['password']} characters long",
                 category="danger",
             )
         elif password != password2:
             flash("Passwords don't match", category="danger")
         else:
-            new_user = User(
+            new_user = db_manager.create_user(
                 display_name=name,
                 email=email,
                 username=username,
                 role="superadmin",
                 password=password,
             )
-            db.session.add(new_user)
-            db.session.commit()
             login_user(new_user, remember=True)
             flash("Registration successful", category="success")
             return redirect(url_for("main.home"))
@@ -81,9 +73,9 @@ def login() -> Response | str:
         password = request.form.get("password", "")
 
         if is_email(email_or_username):
-            user = User.query.filter(User.email == email_or_username).first()
+            user = db_manager.get_user_by_email(email_or_username)
         else:
-            user = User.query.filter(User.username == email_or_username).first()
+            user = db_manager.get_user_by_username(email_or_username)
 
         if user:
             if check_password_hash(user.password, password):
