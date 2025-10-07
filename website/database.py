@@ -93,10 +93,10 @@ class DatabaseManager:
         try:
             user = self.get_user_by_email(email)
             if not user:
-                return Response(type="error", message="User not found")
+                return Response(type="danger", message="User not found")
 
             if not check_password_hash(user.password, current_password):
-                return Response(type="error", message="Current password is incorrect")
+                return Response(type="danger", message="Current password is incorrect")
 
             user.password = generate_password_hash(new_password)
             self.db.session.commit()
@@ -105,7 +105,7 @@ class DatabaseManager:
 
         except Exception as e:
             self.db.session.rollback()
-            return Response(type="error", message=f"Error changing password: {str(e)}")
+            return Response(type="danger", message=f"Error changing password: {str(e)}")
 
     # Database Management Methods
     def create_tables(self, app: Flask) -> None:
