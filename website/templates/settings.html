@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | HubSync{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-4">Settings</h1>
+
+            <!-- Profile Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person-circle me-2"></i>Profile Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        <input type="hidden" name="form_type" value="profile">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="display_name" class="form-label">Display Name</label>
+                                <input type="text" class="form-control" id="display_name" name="display_name"
+                                    value="{{ current_user.display_name }}" required minlength="2">
+                                <div class="form-text">Your name as it appears throughout the application.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    value="{{ current_user.username }}" required minlength="2"
+                                    oninput="this.value = this.value.replace(/\s/g, '')">
+                                <div class="form-text">Your unique username for login.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                value="{{ current_user.email }}" required
+                                oninput="this.value = this.value.replace(/\s/g, '')">
+                            <div class="form-text">Your email address for login and notifications.</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>Change Password
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        <input type="hidden" name="form_type" value="password">
+
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="current_password"
+                                    name="current_password" required minlength="3"
+                                    oninput="this.value = this.value.replace(/\s/g, '')">
+                                <button type="button" class="password-toggle-btn" data-password-toggle
+                                    onclick="togglePasswordVisibility('current_password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password" class="form-label">New Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="new_password" name="new_password"
+                                        required minlength="3" oninput="this.value = this.value.replace(/\s/g, '')">
+                                    <button type="button" class="password-toggle-btn" data-password-toggle
+                                        onclick="togglePasswordVisibility('new_password', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirm_password"
+                                        name="confirm_password" required minlength="3"
+                                        oninput="this.value = this.value.replace(/\s/g, '')">
+                                    <button type="button" class="password-toggle-btn" data-password-toggle
+                                        onclick="togglePasswordVisibility('confirm_password', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning">
+                                Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Theme Preferences Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-palette me-2"></i>Theme Preferences
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        <input type="hidden" name="form_type" value="theme">
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Theme</label>
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" id="theme_auto"
+                                            value="auto">
+                                        <label class="form-check-label" for="theme_auto">
+                                            <i class="bi bi-circle-half me-2"></i>Auto (System)
+                                        </label>
+                                        <div class="form-text small">Follows your system preference</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" id="theme_light"
+                                            value="light">
+                                        <label class="form-check-label" for="theme_light">
+                                            <i class="bi bi-sun me-2"></i>Light
+                                        </label>
+                                        <div class="form-text small">Always use light theme</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" id="theme_dark"
+                                            value="dark">
+                                        <label class="form-check-label" for="theme_dark">
+                                            <i class="bi bi-moon me-2"></i>Dark
+                                        </label>
+                                        <div class="form-text small">Always use dark theme</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-secondary" id="theme-save-btn">
+                                Save Theme Preference
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Information Card (Read-only) -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>Account Information
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">User ID</small>
+                            <p class="mb-2"><code>{{ current_user.id }}</code></p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Role</small>
+                            <p class="mb-2">
+                                <span class="badge bg-primary">{{ current_user.role|title }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme management using localStorage
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Get current theme from localStorage (fallback to themeManager's current theme)
+        let currentTheme = localStorage.getItem('theme_preference');
+        if (!currentTheme && window.themeManager) {
+            currentTheme = window.themeManager.getCurrentTheme();
+        }
+        if (!currentTheme) {
+            currentTheme = 'auto';
+        }
+
+        // Set the correct radio button as checked
+        const currentThemeRadio = document.querySelector(`input[name="theme"][value="${currentTheme}"]`);
+        if (currentThemeRadio) {
+            currentThemeRadio.checked = true;
+        }
+
+        // Apply the theme immediately if themeManager is available
+        if (window.themeManager) {
+            window.themeManager.setTheme(currentTheme);
+        }
+
+        // Handle theme form submission - prevent default and handle with JavaScript
+        const themeForm = document.querySelector('form input[name="form_type"][value="theme"]').closest('form');
+        const themeSaveBtn = document.getElementById('theme-save-btn');
+
+        if (themeForm) {
+            themeForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent form submission
+
+                const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
+
+                // Apply theme immediately
+                if (window.themeManager) {
+                    window.themeManager.setTheme(selectedTheme);
+                }
+            });
+        }
+
+        // Handle theme radio button changes (no action needed since we removed the status display)
+        const themeRadios = document.querySelectorAll('input[name="theme"]');
+        // No need for change listeners since we removed the status display
+
+        console.log('Theme system initialized with:', currentTheme);
+    });
+</script>
+{% endblock %}
