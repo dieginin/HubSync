@@ -15,7 +15,7 @@ def send_password_reset_email(email: str) -> None:
         if not user:
             return
         token = db_manager.generate_reset_password_token(user)
-        reset_link = url_for("auth.reset_password", token=token, _external=True)
+        reset_link = "https://hubsync.nextbale.com/reset_password/" + token
 
         html = f"""
         <html>
