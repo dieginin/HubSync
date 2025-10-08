@@ -130,12 +130,14 @@ def reset_password(token) -> Response | str:
         elif new_password != new_password2:
             flash("Passwords don't match", category="danger")
         else:
-            user = db_manager.get_user_by_email(email)
-            if user and reset_token:
+            if reset_token:
                 reset_token.mark_as_used()
-                db_manager.change_password(user.password, new_password, email)
-                flash("Your password has been updated.", "success")
-                return redirect(url_for("auth.login"))
+                response = db_manager.reset_password(new_password, email)
+                if response.type == "success":
+                    flash(response.message, category=response.type)
+                    return redirect(url_for("auth.login"))
+                else:
+                    flash(response.message, category=response.type)
 
     return render_template("reset_password.html")
 

@@ -107,6 +107,23 @@ class DatabaseManager:
             self.db.session.rollback()
             return Response(type="danger", message=f"Error changing password: {str(e)}")
 
+    def reset_password(self, new_password: str, email: str) -> Response:
+        try:
+            user = self.get_user_by_email(email)
+            if not user:
+                return Response(type="danger", message="User not found")
+
+            user.password = generate_password_hash(new_password)
+            self.db.session.commit()
+
+            return Response(type="success", message="Password reset successfully")
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(
+                type="danger", message=f"Error resetting password: {str(e)}"
+            )
+
     def generate_reset_password_token(self, user: "User") -> str:
         import secrets
 
