@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash
 from website import db_manager
 from website.config import MIN_LENGTHS
 from website.utils import first_setup_only, login_only_if_configured
+from website.utils import send_password_reset_email as password_reset_email
 
 auth = _Blueprint("auth", __name__)
 
@@ -92,9 +93,64 @@ def login() -> Response | str:
     return render_template("login.html")
 
 
+@auth.route("/forgot_password", methods=["GET", "POST"])
+@login_only_if_configured
+def forgot_password() -> Response | str:
+    if request.method == "POST":
+        email = request.form.get("email", "")
+        email_exists = db_manager.get_user_by_email(email) is not None
+
+        if email_exists:
+            password_reset_email(email)
+
+        flash(
+            "If this email is registered, a password reset link has been sent.",
+            category="info",
+        )
+        return redirect(url_for("auth.login"))
+    return render_template("forgot_password.html")
+
+
+@auth.route("/reset_password/<token>", methods=["GET", "POST"])
+@login_only_if_configured
+def reset_password(token) -> Response | str:
+    email, reset_token = db_manager.verify_reset_password_token(token)
+    if not email:
+        flash("The link is invalid or has expired.", "danger")
+        return redirect(url_for("auth.login"))
+
+    if request.method == "POST":
+        new_password = request.form.get("password1", "")
+        new_password2 = request.form.get("password2", "")
+        if len(new_password) < MIN_LENGTHS["password"]:
+            flash(
+                f"Password must be at least {MIN_LENGTHS['password']} characters long",
+                category="danger",
+            )
+        elif new_password != new_password2:
+            flash("Passwords don't match", category="danger")
+        else:
+            user = db_manager.get_user_by_email(email)
+            if user and reset_token:
+                reset_token.mark_as_used()
+                db_manager.change_password(user.password, new_password, email)
+                flash("Your password has been updated.", "success")
+                return redirect(url_for("auth.login"))
+
+    return render_template("reset_password.html")
+
+
 @auth.route("/logout")
 @login_required
 def logout() -> Response:
     logout_user()
     flash("Logout successful", category="success")
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
     return redirect(url_for("auth.login"))

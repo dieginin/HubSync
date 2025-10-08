@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from website.utils import Role
 
 if TYPE_CHECKING:
-    from website.models import User
+    from website.models import PasswordResetToken, User
 
 
 class Response:
@@ -28,17 +28,17 @@ class DatabaseManager:
     def get_user_by_id(self, user_id: int) -> "User | None":
         from website.models import User
 
-        return self.db.session.get(User, user_id)
+        return User.query.get(user_id)
 
     def get_user_by_email(self, email: str) -> "User | None":
         from website.models import User
 
-        return self.db.session.query(User).filter(User.email == email).first()
+        return User.query.filter_by(email=email).first()
 
     def get_user_by_username(self, username: str) -> "User | None":
         from website.models import User
 
-        return self.db.session.query(User).filter(User.username == username).first()
+        return User.query.filter_by(username=username).first()
 
     def create_user(
         self,
@@ -106,6 +106,35 @@ class DatabaseManager:
         except Exception as e:
             self.db.session.rollback()
             return Response(type="danger", message=f"Error changing password: {str(e)}")
+
+    def generate_reset_password_token(self, user: "User") -> str:
+        import secrets
+
+        from website.models import PasswordResetToken
+
+        token = secrets.token_urlsafe(32)
+
+        reset_token = PasswordResetToken(token, user.id)
+        self.db.session.add(reset_token)
+        self.db.session.commit()
+
+        return token
+
+    def verify_reset_password_token(
+        self, token: str
+    ) -> tuple[str, "PasswordResetToken"] | tuple[None, None]:
+        from website.models import PasswordResetToken
+
+        reset_token = PasswordResetToken.query.filter_by(token=token).first()
+        if not reset_token or reset_token.used:
+            return None, None
+        if reset_token.is_expired():
+            self.db.session.delete(reset_token)
+            self.db.session.commit()
+            return None, None
+
+        user = self.get_user_by_id(reset_token.user_id)
+        return (user.email, reset_token) if user else (None, None)
 
     # Database Management Methods
     def create_tables(self, app: Flask) -> None:
