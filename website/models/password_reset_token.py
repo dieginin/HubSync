@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
 
-from sqlalchemy import func
-
 from website import db
 
 

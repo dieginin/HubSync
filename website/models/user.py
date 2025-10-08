@@ -1,5 +1,4 @@
 from flask_login import UserMixin
-from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import generate_password_hash
 
 from website import db
@@ -7,12 +6,12 @@ from website.utils import Role
 
 
 class User(db.Model, UserMixin):
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(db.String(150), unique=True)
-    email: Mapped[str] = mapped_column(db.String(150), unique=True)
-    display_name: Mapped[str] = mapped_column(db.String(150))
-    password: Mapped[str] = mapped_column(db.String(256))
-    role: Mapped[Role] = mapped_column(db.String(10))
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True)
+    email = db.Column(db.String(150), unique=True)
+    display_name = db.Column(db.String(150))
+    password = db.Column(db.String(256))
+    role = db.Column(db.String(10))
 
     def __init__(
         self,
