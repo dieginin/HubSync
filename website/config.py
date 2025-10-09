@@ -17,5 +17,5 @@ MAIL_CONFIG = {
     "USERNAME": os.environ.get("MAIL_USERNAME", ""),
     "PASSWORD": os.environ.get("MAIL_PASSWORD", ""),
     "AUTHOR": f"Auth {APP_NAME}",
-    "SENDER": "no-reply@nextbale.com",
+    "SENDER": f"no-reply@{APP_NAME.lower()}.com",
 }
