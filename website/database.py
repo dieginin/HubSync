@@ -41,12 +41,7 @@ class DatabaseManager:
         return User.query.filter_by(username=username).first()
 
     def create_user(
-        self,
-        display_name: str,
-        email: str,
-        username: str,
-        password: str,
-        role: Role = "user",
+        self, display_name: str, email: str, username: str, password: str, role: Role
     ) -> "User":
         from website.models import User
 
