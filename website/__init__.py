@@ -27,10 +27,13 @@ def create_app() -> Flask:
     def load_user(user_id: str) -> User | None:
         return db_manager.get_user_by_id(int(user_id))
 
-    from .routes import auth, main
+    from .routes import admin, auth, main, room, team
 
+    app.register_blueprint(admin, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
     app.register_blueprint(main, url_prefix="/")
+    app.register_blueprint(room, url_prefix="/")
+    app.register_blueprint(team, url_prefix="/")
 
     db_manager.create_tables(app)
 
