@@ -25,7 +25,7 @@ def send_password_reset_email(email: str) -> None:
 
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="{reset_link}" 
-                           style="padding: 12px 25px; border-radius: 6px; font-weight: bold; display: inline-block;">
+                           style="padding: 12px 25px; font-weight: bold; display: inline-block;">
                             Reset Password
                         </a>
                     </div>
