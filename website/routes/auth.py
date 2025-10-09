@@ -54,11 +54,7 @@ def first_setup() -> Response | str:
             flash("Passwords don't match", category="danger")
         else:
             new_user = db_manager.create_user(
-                display_name=name,
-                email=email,
-                username=username,
-                role="superadmin",
-                password=password,
+                name, email, username, password, "superadmin"
             )
             login_user(new_user, remember=True)
             flash("Registration successful", category="success")
