@@ -144,8 +144,3 @@ const themeManager = new ThemeManager();
 
 // Make it globally available
 window.themeManager = themeManager;
-
-// Log theme changes for debugging
-window.addEventListener('themechange', (e) => {
-    console.log('Theme changed:', e.detail);
-});

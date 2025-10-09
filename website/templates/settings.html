@@ -194,17 +194,16 @@
 </div>
 
 <script>
-    // Theme management using localStorage
+    // Theme management using themeManager
     document.addEventListener('DOMContentLoaded', function () {
+        // Wait for themeManager to be available
+        if (!window.themeManager) {
+            console.error('ThemeManager not available');
+            return;
+        }
 
-        // Get current theme from localStorage (fallback to themeManager's current theme)
-        let currentTheme = localStorage.getItem('theme_preference');
-        if (!currentTheme && window.themeManager) {
-            currentTheme = window.themeManager.getCurrentTheme();
-        }
-        if (!currentTheme) {
-            currentTheme = 'auto';
-        }
+        // Get current theme from themeManager (single source of truth)
+        const currentTheme = window.themeManager.getCurrentTheme();
 
         // Set the correct radio button as checked
         const currentThemeRadio = document.querySelector(`input[name="theme"][value="${currentTheme}"]`);
@@ -212,33 +211,17 @@
             currentThemeRadio.checked = true;
         }
 
-        // Apply the theme immediately if themeManager is available
-        if (window.themeManager) {
-            window.themeManager.setTheme(currentTheme);
-        }
-
-        // Handle theme form submission - prevent default and handle with JavaScript
+        // Handle theme form submission - prevent default and use themeManager
         const themeForm = document.querySelector('form input[name="form_type"][value="theme"]').closest('form');
-        const themeSaveBtn = document.getElementById('theme-save-btn');
 
         if (themeForm) {
             themeForm.addEventListener('submit', function (e) {
-                e.preventDefault(); // Prevent form submission
-
                 const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
 
-                // Apply theme immediately
-                if (window.themeManager) {
-                    window.themeManager.setTheme(selectedTheme);
-                }
+                // Use themeManager to apply theme (single responsibility)
+                window.themeManager.setTheme(selectedTheme);
             });
         }
-
-        // Handle theme radio button changes (no action needed since we removed the status display)
-        const themeRadios = document.querySelectorAll('input[name="theme"]');
-        // No need for change listeners since we removed the status display
-
-        console.log('Theme system initialized with:', currentTheme);
     });
 </script>
 {% endblock %}

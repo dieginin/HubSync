@@ -5,6 +5,19 @@
 
 class NavbarManager {
     constructor() {
+        // Map routes to their corresponding navigation link IDs
+        this.routeToIdMap = {
+            '/': 'home-link',
+            '/home': 'home-link',
+            '/settings': 'settings-link',
+            // Add more mappings as you implement the routes
+            '/staff': 'staff-link',
+            '/schedule': 'schedule-link',
+            '/layouts': 'layouts-link',
+            '/tasks': 'tasks-link',
+            '/invox': 'invox-link'
+        };
+
         this.init();
     }
 
@@ -21,43 +34,60 @@ class NavbarManager {
      */
     setActiveLinkFromURL() {
         const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.offcanvas .nav-pills .nav-link');
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            link.removeAttribute('aria-current');
+        // Get the corresponding link ID for the current path
+        const activeLinkId = this.routeToIdMap[currentPath];
 
-            // Check if the link's href matches the current path
-            const linkPath = new URL(link.href).pathname;
-            if (linkPath === currentPath) {
-                this.setActiveLink(link);
-            }
-        });
-
-        // Special case for home page - if no match found and we're at root
-        if (currentPath === '/' || currentPath === '') {
-            const homeLink = document.querySelector('.offcanvas .nav-pills .nav-link[href="/"]');
-            if (homeLink && !document.querySelector('.offcanvas .nav-pills .nav-link.active')) {
-                this.setActiveLink(homeLink);
-            }
+        if (activeLinkId) {
+            this.setActiveLinkById(activeLinkId);
+        } else {
+            // Fallback: try to find a link by href if no ID mapping exists
+            this.setActiveLinkByHref(currentPath);
         }
     }
 
     /**
-     * Set a specific link as active
-     * @param {HTMLElement} activeLink - The link element to set as active
+     * Set a specific link as active by ID
+     * @param {string} linkId - The ID of the link element to set as active
      */
-    setActiveLink(activeLink) {
-        // Remove active class from all navigation links in offcanvas
+    setActiveLinkById(linkId) {
+        // Remove active class from all navigation links
+        this.clearAllActiveStates();
+
+        // Find and activate the specific link by ID
+        const activeLink = document.getElementById(linkId);
+        if (activeLink && activeLink.classList.contains('nav-link')) {
+            activeLink.classList.add('active');
+            activeLink.setAttribute('aria-current', 'page');
+        }
+    }
+
+    /**
+     * Set a specific link as active by href (fallback method)
+     * @param {string} href - The href to match
+     */
+    setActiveLinkByHref(href) {
+        const navLinks = document.querySelectorAll('.offcanvas .nav-pills .nav-link');
+
+        navLinks.forEach(link => {
+            const linkPath = new URL(link.href).pathname;
+            if (linkPath === href) {
+                this.setActiveLink(link);
+            }
+        });
+    }
+
+    /**
+     * Clear active state from all navigation links
+     */
+    clearAllActiveStates() {
         document.querySelectorAll('.offcanvas .nav-pills .nav-link').forEach(link => {
             link.classList.remove('active');
             link.removeAttribute('aria-current');
         });
-
-        // Add active class to the clicked link
-        activeLink.classList.add('active');
-        activeLink.setAttribute('aria-current', 'page');
     }
+
+
 
     /**
      * Attach click handlers to navigation links
@@ -66,20 +96,24 @@ class NavbarManager {
         const navLinks = document.querySelectorAll('.offcanvas .nav-pills .nav-link');
 
         navLinks.forEach(link => {
-            // Skip logout link as it doesn't need active state (it's not in offcanvas anymore)
+            // Skip logout link as it doesn't need active state
             if (link.getAttribute('href') === '/logout') {
                 return;
             }
 
             link.addEventListener('click', (e) => {
-                // Set active state immediately for better UX
-                this.setActiveLink(link);
+                const linkId = link.id;
 
-                // Store the active link in sessionStorage for persistence
-                sessionStorage.setItem('activeNavLink', link.getAttribute('href'));
+                if (linkId) {
+                    // Set active state using ID
+                    this.setActiveLinkById(linkId);
+                } else {
+                    // If no ID is present, we can't set active state properly
+                    console.warn('Navigation link missing ID:', link.href);
+                }
 
-                // Close offcanvas after clicking a link (optional)
-                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('navigationOffcanvas'));
+                // Close offcanvas after clicking a link
+                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasNavbar'));
                 if (offcanvas) {
                     offcanvas.hide();
                 }
@@ -87,27 +121,18 @@ class NavbarManager {
         });
     }
 
-    /**
-     * Restore active state from sessionStorage if available
-     */
-    restoreActiveState() {
-        const storedActiveLink = sessionStorage.getItem('activeNavLink');
-        if (storedActiveLink) {
-            const link = document.querySelector(`.offcanvas .nav-pills .nav-link[href="${storedActiveLink}"]`);
-            if (link) {
-                this.setActiveLink(link);
-            }
-        }
-    }
+
 }
 
 // Initialize navbar manager when DOM is loaded
+let navbarManager;
 document.addEventListener('DOMContentLoaded', () => {
-    new NavbarManager();
+    navbarManager = new NavbarManager();
 });
 
 // Handle browser back/forward navigation
 window.addEventListener('popstate', () => {
-    const navbarManager = new NavbarManager();
-    navbarManager.setActiveLinkFromURL();
+    if (navbarManager) {
+        navbarManager.setActiveLinkFromURL();
+    }
 });

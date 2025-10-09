@@ -58,8 +58,33 @@
                         <!-- Main navigation -->
                         <ul class="nav nav-pills flex-column mb-auto">
                             <li class="nav-item">
-                                <a class="nav-link active" href="{{ url_for('main.home') }}">
-                                    <i class="bi bi-house me-2"></i>Home
+                                <a class="nav-link" id="home-link" href="{{ url_for('main.home') }}">
+                                    <i class="bi bi-house-fill me-2"></i>Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="staff-link" href="#">
+                                    <i class="bi bi-people-fill me-2"></i>Staff
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="schedule-link" href="#">
+                                    <i class="bi bi-calendar-week-fill me-2"></i>Schedule
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="layouts-link" href="#">
+                                    <i class="bi bi-grid-1x2-fill me-2"></i>Layouts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="tasks-link" href="#">
+                                    <i class="bi bi-list-task me-2"></i>Tasks
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="invox-link" href="#">
+                                    <i class="bi bi-receipt me-2"></i>Invox
                                 </a>
                             </li>
                         </ul>
@@ -68,7 +93,7 @@
                         <hr>
                         <ul class="nav nav-pills flex-column">
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.settings') }}">
+                                <a class="nav-link" id="settings-link" href="{{ url_for('main.settings') }}">
                                     <i class="bi bi-gear-fill me-2"></i>Settings
                                 </a>
                             </li>
