@@ -70,6 +70,39 @@ button,
     box-shadow: 0 0.125rem 0.25rem var(--shadow);
 }
 
+/* ----- CUSTOM BADGE CLASSES ----- */
+/* Role-specific badge styles */
+.bg-superadmin {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+.bg-admin {
+    background-color: var(--bs-secondary) !important;
+    color: white !important;
+}
+
+.bg-member {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+/* Dark theme adjustments for custom badges */
+[data-bs-theme="dark"] .bg-superadmin {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+[data-bs-theme="dark"] .bg-admin {
+    background-color: var(--bs-secondary) !important;
+    color: white !important;
+}
+
+[data-bs-theme="dark"] .bg-member {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
 /* ----- NAVIGATION COMPONENTS ----- */
 /* Main navbar */
 .navbar {

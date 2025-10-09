@@ -183,7 +183,13 @@
                         <div class="col-md-6">
                             <small class="text-muted">Role</small>
                             <p class="mb-2">
-                                <span class="badge bg-primary">{{ current_user.role|title }}</span>
+                                {% if current_user.role == 'superadmin' %}
+                                <span class="badge rounded-pill bg-superadmin">{{ current_user.role }}</span>
+                                {% elif current_user.role == 'admin' %}
+                                <span class="badge rounded-pill bg-admin">{{ current_user.role }}</span>
+                                {% else %}
+                                <span class="badge rounded-pill bg-member">{{ current_user.role }}</span>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
