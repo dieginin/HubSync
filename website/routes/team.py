@@ -8,10 +8,10 @@ team = _Blueprint("team", __name__)
 @team.route("/schedule")
 @login_required
 def schedule() -> str:
-    return render_template("schedule.html")
+    return render_template("team/schedule.html")
 
 
 @team.route("/tasks")
 @login_required
 def tasks() -> str:
-    return render_template("tasks.html")
+    return render_template("team/tasks.html")

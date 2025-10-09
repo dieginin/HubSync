@@ -8,4 +8,4 @@ room = _Blueprint("room", __name__)
 @room.route("/layouts")
 @login_required
 def layouts() -> str:
-    return render_template("layouts.html")
+    return render_template("room/layouts.html")

@@ -11,7 +11,7 @@ main = _Blueprint("main", __name__)
 @main.route("/")
 @login_required
 def home() -> str:
-    return render_template("home.html")
+    return render_template("main/home.html")
 
 
 @main.route("/settings", methods=["GET", "POST"])
@@ -80,4 +80,4 @@ def settings() -> str:
                 flash("Invalid theme selection", category="danger")
             else:
                 flash("Theme preference saved successfully", category="success")
-    return render_template("settings.html")
+    return render_template("main/settings.html")

@@ -8,10 +8,10 @@ admin = _Blueprint("admin", __name__)
 @admin.route("/staff")
 @login_required
 def staff() -> str:
-    return render_template("staff.html")
+    return render_template("admin/staff.html")
 
 
 @admin.route("/invox")
 @login_required
 def invox() -> str:
-    return render_template("invox.html")
+    return render_template("admin/invox.html")

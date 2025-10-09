@@ -63,7 +63,7 @@ def first_setup() -> Response | str:
             login_user(new_user, remember=True)
             flash("Registration successful", category="success")
             return redirect(url_for("main.home"))
-    return render_template("first_setup.html")
+    return render_template("auth/first_setup.html")
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -90,7 +90,7 @@ def login() -> Response | str:
                 flash("Email does not exist", category="danger")
             else:
                 flash("Username does not exist", category="danger")
-    return render_template("login.html")
+    return render_template("auth/login.html")
 
 
 @auth.route("/forgot_password", methods=["GET", "POST"])
@@ -108,7 +108,7 @@ def forgot_password() -> Response | str:
             category="info",
         )
         return redirect(url_for("auth.login"))
-    return render_template("forgot_password.html")
+    return render_template("auth/forgot_password.html")
 
 
 @auth.route("/reset_password/<token>", methods=["GET", "POST"])
@@ -139,7 +139,7 @@ def reset_password(token) -> Response | str:
                 else:
                     flash(response.message, category=response.type)
 
-    return render_template("reset_password.html")
+    return render_template("auth/reset_password.html")
 
 
 @auth.route("/logout")
