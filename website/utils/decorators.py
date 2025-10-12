@@ -37,7 +37,7 @@ def admin_only(f):
         if not current_user.is_admin():
             from flask import flash
 
-            flash("Access denied. Admin privileges required.", "danger")
+            flash("Access denied. Admin privileges required", "danger")
             return redirect(url_for("main.home"))
         return f(*args, **kwargs)
 
