@@ -33,6 +33,7 @@ def staff() -> Response | str:
             flash("Username already in use.", "danger")
         else:
             db_manager.create_user(name, email, username, "carefree", selected_role)
+            flash(f"User {name} created with default password 'carefree'", "success")
     return render_template("admin/staff.html", staff=User.query.all())
 
 
