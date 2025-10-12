@@ -78,3 +78,13 @@ def settings() -> str:
             else:
                 flash("Theme preference saved successfully", category="success")
     return render_template("main/settings.html")
+
+
+@main.route("/offline")
+def offline() -> str:
+    return render_template("main/offline.html")
+
+
+@main.route("/test-offline")
+def test_offline() -> str:
+    return render_template("main/test-offline.html")
