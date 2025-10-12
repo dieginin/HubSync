@@ -29,3 +29,16 @@ def login_only_if_configured(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def admin_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs) -> Response | str:
+        if not current_user.is_admin():
+            from flask import flash
+
+            flash("Access denied. Admin privileges required.", "danger")
+            return redirect(url_for("main.home"))
+        return f(*args, **kwargs)
+
+    return decorated_function
