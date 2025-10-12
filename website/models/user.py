@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
         email: str,
         username: str,
         password: str,
-        role: Role = "user",
+        role: Role = "member",
     ) -> None:
         super().__init__()
         self.display_name = display_name
