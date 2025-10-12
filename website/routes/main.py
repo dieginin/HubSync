@@ -39,10 +39,7 @@ def settings() -> str:
                 flash(f"Please enter a valid email address", category="danger")
             else:
                 response = db_manager.update_user_profile(
-                    user_id=current_user.id,
-                    email=email,
-                    username=username,
-                    name=display_name,
+                    current_user.id, display_name, email, username
                 )
                 flash(response.message, category=response.type)
 
