@@ -56,8 +56,34 @@ class DatabaseManager:
         self.db.session.commit()
         return new_user
 
+    def delete_user(self, user_id: int) -> Response:
+        try:
+            user = self.get_user_by_id(user_id)
+            if not user:
+                return Response(type="danger", message="User not found")
+
+            if user_id == 1:
+                return Response(
+                    type="danger", message="Cannot delete the primary admin user"
+                )
+
+            self.db.session.delete(user)
+            self.db.session.commit()
+            return Response(
+                type="success", message=f"{user.display_name} deleted successfully"
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(type="danger", message=f"Error deleting user: {str(e)}")
+
     def update_user_profile(
-        self, user_id: int, email: str, username: str, display_name: str
+        self,
+        user_id: int,
+        display_name: str,
+        email: str,
+        username: str,
+        role: Role | None = None,
     ) -> Response:
         try:
             user = self.get_user_by_id(user_id)
@@ -74,6 +100,8 @@ class DatabaseManager:
             user.email = email
             user.username = username
             user.display_name = display_name
+            if role:
+                user.role = role
 
             self.db.session.commit()
             return Response(type="success", message="Profile updated successfully")

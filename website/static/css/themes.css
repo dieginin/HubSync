@@ -186,8 +186,32 @@ button,
     box-shadow: 0 0 0 0.25rem rgba(36, 137, 57, 0.25);
 }
 
+/* Form select (dropdown) styling */
+.form-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--bs-body-color);
+}
+
+.form-select:focus {
+    background-color: var(--input-bg);
+    border-color: var(--bs-primary);
+    color: var(--bs-body-color);
+    box-shadow: 0 0 0 0.25rem rgba(36, 137, 57, 0.25);
+}
+
+.form-select option {
+    background-color: var(--input-bg);
+    color: var(--bs-body-color);
+}
+
 /* Dark theme form control focus */
 [data-bs-theme="dark"] .form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* Dark theme form select focus */
+[data-bs-theme="dark"] .form-select:focus {
     box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
 }
 

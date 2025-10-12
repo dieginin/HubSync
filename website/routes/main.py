@@ -42,7 +42,7 @@ def settings() -> str:
                     user_id=current_user.id,
                     email=email,
                     username=username,
-                    display_name=display_name,
+                    name=display_name,
                 )
                 flash(response.message, category=response.type)
 
