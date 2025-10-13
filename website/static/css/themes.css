@@ -454,3 +454,108 @@ button,
     color: #155724 !important;
     text-decoration: underline;
 }
+
+/* ----- PULL TO REFRESH STYLES ----- */
+.pull-to-refresh-container {
+    position: relative;
+    overflow: hidden;
+    min-height: calc(100vh - 130px);
+    /* Ensure enough space for pulling, accounting for navbar */
+}
+
+.pull-to-refresh-indicator {
+    position: fixed;
+    /* Changed to fixed to work with document-wide events */
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.pull-to-refresh-indicator.visible {
+    opacity: 1;
+    top: 75px;
+    /* Account for navbar height */
+}
+
+.pull-to-refresh-indicator.loading {
+    animation: spin 1s linear infinite;
+}
+
+.pull-to-refresh-indicator i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.pull-to-refresh-indicator.ready i {
+    transform: rotate(180deg);
+}
+
+.pull-to-refresh-content {
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.pull-to-refresh-content.pulling {
+    transform: translateY(60px);
+}
+
+@keyframes spin {
+    0% {
+        transform: translateX(-50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translateX(-50%) rotate(360deg);
+    }
+}
+
+/* Pull to refresh message */
+.pull-to-refresh-message {
+    position: fixed;
+    /* Changed to fixed to work with document-wide events */
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1049;
+    /* Below indicator but above content */
+    box-shadow: 0 2px 8px var(--shadow);
+    white-space: nowrap;
+}
+
+.pull-to-refresh-message.visible {
+    opacity: 1;
+    top: 125px;
+    /* Account for navbar height + indicator */
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .pull-to-refresh-indicator {
+    background-color: var(--bs-primary);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+[data-bs-theme="dark"] .pull-to-refresh-message {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}

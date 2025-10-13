@@ -3,172 +3,183 @@
 {% block title %}Staff | HubSync{% endblock %}
 
 {% block content %}
-<div class="d-grid">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newMemberModal">
-        Add Staff Member
-    </button>
-</div>
-<ul class="list-group list-group-flush mt-2" id="staff-list">
-    {% for member in staff if member.id != 1 and current_user.id != member.id %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            {{ member.display_name }}&emsp;
-            {% if member.role == 'superadmin' %}
-            <span class="badge rounded-pill bg-superadmin">{{ member.role }}</span>
-            {% elif member.role == 'admin' %}
-            <span class="badge rounded-pill bg-admin">{{ member.role }}</span>
-            {% else %}
-            <span class="badge rounded-pill bg-member">{{ member.role }}</span>
-            {% endif %}
-        </div>
-        <div class="btn-group" role="group" aria-label="Staff Actions">
-            <button type="button" class="btn btn-sm btn-warning" title="Edit" data-bs-toggle="modal"
-                data-bs-target="#editModal{{ member.id }}">
-                <i class="bi bi-pencil-fill"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
-                data-bs-target="#deleteModal{{ member.id }}">
-                <i class="bi bi-trash-fill"></i>
-            </button>
-        </div>
-    </li>
+<div data-pull-to-refresh>
+    <div class="d-grid">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newMemberModal">
+            Add Staff Member
+        </button>
+    </div>
+    <ul class="list-group list-group-flush mt-2" id="staff-list">
+        {% for member in staff if member.id != 1 and current_user.id != member.id %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                {{ member.display_name }}&emsp;
+                {% if member.role == 'superadmin' %}
+                <span class="badge rounded-pill bg-superadmin">{{ member.role }}</span>
+                {% elif member.role == 'admin' %}
+                <span class="badge rounded-pill bg-admin">{{ member.role }}</span>
+                {% else %}
+                <span class="badge rounded-pill bg-member">{{ member.role }}</span>
+                {% endif %}
+            </div>
+            <div class="btn-group" role="group" aria-label="Staff Actions">
+                <button type="button" class="btn btn-sm btn-warning" title="Edit" data-bs-toggle="modal"
+                    data-bs-target="#editModal{{ member.id }}">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal{{ member.id }}">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+        </li>
 
-    <!-- Edit Modal for {{ member.display_name }} -->
-    <div class="modal fade" id="editModal{{ member.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ member.id }}"
-        aria-hidden="true">
+        <!-- Edit Modal for {{ member.display_name }} -->
+        <div class="modal fade" id="editModal{{ member.id }}" tabindex="-1"
+            aria-labelledby="editModalLabel{{ member.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="editModalLabel{{ member.id }}">Edit Staff Member</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form-{{ member.id }}" method="POST"
+                            action="{{ url_for('admin.edit_staff_member', user_id=member.id) }}">
+                            <div class="mb-3">
+                                <label for="display_name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="display_name" name="display_name"
+                                    value="{{ member.display_name }}" required minlength="2">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    value="{{ member.email }}" required minlength="5"
+                                    oninput="this.value = this.value.replace(/\s/g, '')">
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    value="{{ member.username }}" required minlength="2"
+                                    oninput="this.value = this.value.replace(/\s/g, '')">
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" id="role" name="role" required {% if current_user.role
+                                    !='superadmin' %}disabled{% endif %}>
+                                    <option value="superadmin" {% if member.role=='superadmin' %}selected{% endif %}>
+                                        Super
+                                        Admin</option>
+                                    <option value="admin" {% if member.role=='admin' %}selected{% endif %}>Admin
+                                    </option>
+                                    <option value="member" {% if member.role=='member' %}selected{% endif %}>Member
+                                    </option>
+                                </select>
+                                {% if current_user.role != 'superadmin' %}
+                                <input type="hidden" name="role" value="{{ member.role }}">
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Only Super Admins can change user roles
+                                </small>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" form="edit-form-{{ member.id }}" class="btn btn-primary">Save
+                            Changes</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal for {{ member.display_name }} -->
+        <div class="modal fade" id="deleteModal{{ member.id }}" tabindex="-1"
+            aria-labelledby="deleteModalLabel{{ member.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteModalLabel{{ member.id }}">Delete Staff Member</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">Are you sure you want to delete <strong>{{ member.display_name }}</strong>?</p>
+                        <div class="alert alert-warning text-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            This action cannot be undone. All data associated with this user will be permanently
+                            deleted.
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <form method="POST" action="{{ url_for('admin.delete_staff_member', user_id=member.id) }}">
+                            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <li class="list-group-item text-center text-muted">No staff members found</li>
+        {% endfor %}
+    </ul>
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="newMemberModal" tabindex="-1" aria-labelledby="newMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="editModalLabel{{ member.id }}">Edit Staff Member</h1>
+                    <h1 class="modal-title fs-5" id="newMemberModalLabel">Add Staff Member</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="edit-form-{{ member.id }}" method="POST"
-                        action="{{ url_for('admin.edit_staff_member', user_id=member.id) }}">
-                        <div class="mb-3">
-                            <label for="display_name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="display_name" name="display_name"
-                                value="{{ member.display_name }}" required minlength="2">
+                    <form id="add-member-form" method="POST">
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name"
+                                required minlength="2">
                         </div>
-                        <div class="mb-3">
+                        <div class="form-group mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ member.email }}"
-                                required minlength="5" oninput="this.value = this.value.replace(/\s/g, '')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username"
-                                value="{{ member.username }}" required minlength="2"
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="Enter your email" required minlength="5"
                                 oninput="this.value = this.value.replace(/\s/g, '')">
                         </div>
-                        <div class="mb-3">
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                placeholder="Enter a username" required minlength="2"
+                                oninput="this.value = this.value.replace(/\s/g, '')">
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required {% if current_user.role
-                                !='superadmin' %}disabled{% endif %}>
-                                <option value="superadmin" {% if member.role=='superadmin' %}selected{% endif %}>Super
-                                    Admin</option>
-                                <option value="admin" {% if member.role=='admin' %}selected{% endif %}>Admin</option>
-                                <option value="member" {% if member.role=='member' %}selected{% endif %}>Member</option>
+                            <select class="form-select" id="role" name="role" {% if current_user.role !='superadmin'
+                                %}disabled{% endif %}>
+                                <option value="member" selected>Member</option>
+                                <option value="admin" {% if current_user.role !='superadmin' %}disabled{% endif %}>Admin
+                                </option>
+                                <option value="superadmin" {% if current_user.role !='superadmin' %}disabled{% endif %}>
+                                    Super Admin</option>
                             </select>
                             {% if current_user.role != 'superadmin' %}
-                            <input type="hidden" name="role" value="{{ member.role }}">
+                            <!-- Hidden input to ensure 'member' role when form is submitted -->
+                            <input type="hidden" name="role" value="member">
                             <small class="form-text text-muted">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Only Super Admins can change user roles
+                                Only Super Admins can assign Admin or Super Admin roles
                             </small>
                             {% endif %}
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="submit" form="edit-form-{{ member.id }}" class="btn btn-primary">Save Changes</button>
+                    <button type="submit" form="add-member-form" class="btn btn-primary">Add Member</button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Delete Confirmation Modal for {{ member.display_name }} -->
-    <div class="modal fade" id="deleteModal{{ member.id }}" tabindex="-1"
-        aria-labelledby="deleteModalLabel{{ member.id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteModalLabel{{ member.id }}">Delete Staff Member</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-3">Are you sure you want to delete <strong>{{ member.display_name }}</strong>?</p>
-                    <div class="alert alert-warning text-center" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        This action cannot be undone. All data associated with this user will be permanently deleted.
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <form method="POST" action="{{ url_for('admin.delete_staff_member', user_id=member.id) }}">
-                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <li class="list-group-item text-center text-muted">No staff members found</li>
-    {% endfor %}
-</ul>
-<!-- Add Member Modal -->
-<div class="modal fade" id="newMemberModal" tabindex="-1" aria-labelledby="newMemberModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="newMemberModalLabel">Add Staff Member</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="add-member-form" method="POST">
-                    <div class="form-group mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name"
-                            required minlength="2">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email"
-                            required minlength="5" oninput="this.value = this.value.replace(/\s/g, '')">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username"
-                            placeholder="Enter a username" required minlength="2"
-                            oninput="this.value = this.value.replace(/\s/g, '')">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" name="role" {% if current_user.role !='superadmin'
-                            %}disabled{% endif %}>
-                            <option value="member" selected>Member</option>
-                            <option value="admin" {% if current_user.role !='superadmin' %}disabled{% endif %}>Admin
-                            </option>
-                            <option value="superadmin" {% if current_user.role !='superadmin' %}disabled{% endif %}>
-                                Super Admin</option>
-                        </select>
-                        {% if current_user.role != 'superadmin' %}
-                        <!-- Hidden input to ensure 'member' role when form is submitted -->
-                        <input type="hidden" name="role" value="member">
-                        <small class="form-text text-muted">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Only Super Admins can assign Admin or Super Admin roles
-                        </small>
-                        {% endif %}
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="submit" form="add-member-form" class="btn btn-primary">Add Member</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-            </div>
-        </div>
-    </div>
 </div>
+
+<script src="{{ url_for('static', filename='js/pull-to-refresh.js') }}"></script>
 {% endblock %}
