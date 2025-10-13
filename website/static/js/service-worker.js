@@ -1,5 +1,4 @@
-const CACHE_NAME = "hubsync-cache-v5";
-const OFFLINE_PAGE = "/static/offline.html";
+const CACHE_NAME = "hubsync-cache-v1";
 const URLS_TO_CACHE = [
     "/",
     "/static/site.webmanifest",
@@ -16,140 +15,36 @@ const URLS_TO_CACHE = [
     "/static/js/password-toggle.js",
     "/static/js/service-worker.js",
     "/static/js/theme-manager.js",
-    OFFLINE_PAGE
+    "/offline"
 ];
 
 self.addEventListener("install", (event) => {
-    console.log('Service Worker installing...');
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Opened cache:', CACHE_NAME);
-                console.log('Caching offline page:', OFFLINE_PAGE);
-                return cache.add(OFFLINE_PAGE)
-                    .then(() => {
-                        console.log('Successfully cached offline page');
-                        // Try to cache other resources but don't fail the install
-                        const otherUrls = URLS_TO_CACHE.filter(url => url !== OFFLINE_PAGE);
-                        return Promise.allSettled(
-                            otherUrls.map(url =>
-                                cache.add(url)
-                                    .then(() => console.log('Cached:', url))
-                                    .catch(err => console.warn('Failed to cache:', url, err))
-                            )
-                        );
-                    });
-            })
-            .catch(err => {
-                console.error('Failed to open cache or cache offline page:', err);
-                throw err;
-            })
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(URLS_TO_CACHE);
+        })
     );
-    self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
+                cacheNames.map((name) => {
+                    if (name !== CACHE_NAME) {
+                        return caches.delete(name);
                     }
                 })
             );
         })
     );
-    self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-    // Only handle GET requests
-    if (event.request.method !== 'GET') {
-        return;
-    }
-
-    // Only handle navigation requests (HTML pages)
-    if (event.request.mode === 'navigate') {
-        console.log('Navigation request:', event.request.url);
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    console.log('Navigation fetch successful:', event.request.url);
-                    return response;
-                })
-                .catch(() => {
-                    console.log('Navigation fetch failed, serving offline page for:', event.request.url);
-                    return caches.match(OFFLINE_PAGE)
-                        .then(response => {
-                            if (response) {
-                                console.log('Found offline page in cache');
-                                return response;
-                            }
-                            console.log('Offline page not found in cache, serving fallback');
-                            // Fallback if offline page not in cache
-                            return new Response(
-                                `<!DOCTYPE html>
-                                <html><head><title>Offline - HubSync</title></head>
-                                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
-                                    <h1>No Internet Connection</h1>
-                                    <p>Please check your connection and try again.</p>
-                                    <button onclick="window.location.reload()">Retry</button>
-                                    <p><small>Service Worker fallback</small></p>
-                                </body></html>`,
-                                { headers: { 'Content-Type': 'text/html' } }
-                            );
-                        });
-                })
-        );
-        return;
-    }
-
-    // For other resources, use cache first
     event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                if (response) {
-                    return response;
-                }
-
-                // If not in cache, try fetch
-                return fetch(event.request)
-                    .then((response) => {
-                        // If it's a static resource, add it to cache
-                        if (response.status === 200 &&
-                            (event.request.url.includes('/static/') ||
-                                event.request.url.includes('.css') ||
-                                event.request.url.includes('.js') ||
-                                event.request.url.includes('.png') ||
-                                event.request.url.includes('.jpg') ||
-                                event.request.url.includes('.svg'))) {
-
-                            const responseToCache = response.clone();
-                            caches.open(CACHE_NAME)
-                                .then((cache) => {
-                                    cache.put(event.request, responseToCache);
-                                });
-                        }
-
-                        return response;
-                    })
-                    .catch(() => {
-                        // If it's an image and not available, return a placeholder image
-                        if (event.request.destination === 'image') {
-                            return new Response(
-                                '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#ddd"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#999">No image</text></svg>',
-                                { headers: { 'Content-Type': 'image/svg+xml' } }
-                            );
-                        }
-
-                        // For other resources, simply fail
-                        return new Response('Resource not available offline', {
-                            status: 404,
-                            statusText: 'Not Found'
-                        });
-                    });
-            })
+        fetch(event.request).catch(async () => {
+            const response = await caches.match(event.request);
+            return response || caches.match("/offline");
+        })
     );
 });

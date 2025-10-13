@@ -125,10 +125,13 @@
     <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme-manager.js') }}"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('{{ url_for("static", filename="js/service-worker.js") }}')
-                .then(() => console.log('Service Worker registered'))
-                .catch((error) => console.error('Service Worker registration failed:', error));
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .register("/static/service-worker.js")
+                    .then((reg) => console.log("Service Worker registered:", reg.scope))
+                    .catch((err) => console.log("Error registering Service Worker:", err));
+            });
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

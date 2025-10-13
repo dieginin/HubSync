@@ -80,6 +80,6 @@ def settings() -> str:
     return render_template("main/settings.html")
 
 
-@main.route("/test-offline")
-def test_offline() -> str:
-    return render_template("main/test-offline.html")
+@main.route("/offline")
+def offline() -> str:
+    return render_template("main/offline.html")
