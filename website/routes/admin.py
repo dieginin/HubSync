@@ -20,7 +20,7 @@ def staff() -> Response | str:
     from website.models import User
 
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
+        name = request.form.get("name", "").strip().title()
         email = request.form.get("email", "")
         username = request.form.get("username", "")
         role = request.form.get("role", "member")
@@ -41,7 +41,7 @@ def staff() -> Response | str:
 @login_required
 @admin_only
 def edit_staff_member(user_id: int) -> Response:
-    name = request.form.get("display_name", "").strip()
+    name = request.form.get("display_name", "").strip().title()
     email = request.form.get("email", "")
     username = request.form.get("username", "")
     role = request.form.get("role", "member")

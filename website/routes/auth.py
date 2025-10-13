@@ -20,7 +20,7 @@ is_email = lambda x: bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", x))
 @first_setup_only
 def first_setup() -> Response | str:
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
+        name = request.form.get("name", "").strip().title()
         email = request.form.get("email", "")
         username = request.form.get("username", "")
         password = request.form.get("password1", "")
