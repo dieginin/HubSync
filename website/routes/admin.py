@@ -5,7 +5,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from werkzeug import Response
 
-from website.utils import admin_only
+from website.utils import admin_only, superadmin_only
 
 admin = _Blueprint("admin", __name__)
 
@@ -66,6 +66,6 @@ def delete_staff_member(user_id: int) -> Response:
 
 @admin.route("/invox")
 @login_required
-@admin_only
+@superadmin_only
 def invox() -> str:
     return render_template("admin/invox.html")

@@ -31,6 +31,17 @@ def login_only_if_configured(f):
     return decorated_function
 
 
+def superadmin_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs) -> Response | str:
+        if not current_user.role == "superadmin":
+            flash("Access denied. Superadmin privileges required", "danger")
+            return redirect(request.referrer or url_for("main.home"))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs) -> Response | str:
