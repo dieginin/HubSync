@@ -33,12 +33,12 @@
 
         <h2 class="h4 mb-3">📝 Technical Notes:</h2>
         <ul class="list-unstyled">
-            <li class="mb-2">✅ The offline page inherits from base.html and uses theme variables</li>
+            <li class="mb-2">✅ The offline page is a self-contained static HTML file</li>
             <li class="mb-2">✅ The Service Worker automatically caches the offline page</li>
             <li class="mb-2">✅ Automatic reconnection detection every 5 seconds</li>
             <li class="mb-2">✅ Fallback for unavailable images</li>
             <li class="mb-2">✅ Smart caching of static resources</li>
-            <li class="mb-2">✅ Responsive design with Bootstrap integration</li>
+            <li class="mb-2">✅ Theme detection works offline (respects system preferences)</li>
         </ul>
     </div>
 </div>
@@ -67,7 +67,7 @@
                         ✅ Service Worker registered successfully<br>
                         📍 Scope: ${registrations[0].scope}<br>
                         🔄 Status: ${registrations[0].active ? 'Active' : 'Inactive'}<br>
-                        🗄️ Cache: hubsync-cache-v3
+                        🗄️ Cache: hubsync-cache-v4
                     `;
                 } else {
                     swStatus.className = 'alert alert-warning';
@@ -82,7 +82,7 @@
 
     // Show offline page directly
     function testOfflinePage() {
-        window.open('/offline', '_blank');
+        window.open('/static/offline.html', '_blank');
     }
 
     // Simulate offline (only shows instructions)
