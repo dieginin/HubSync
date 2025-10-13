@@ -128,7 +128,7 @@
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function () {
                 navigator.serviceWorker
-                    .register("/static/service-worker.js")
+                    .register('{{ url_for("static", filename="js/service-worker.js") }}')
                     .then((reg) => console.log("Service Worker registered:", reg.scope))
                     .catch((err) => console.log("Error registering Service Worker:", err));
             });
