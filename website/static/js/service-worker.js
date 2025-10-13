@@ -1,4 +1,4 @@
-const CACHE_NAME = "hubsync-cache-v4";
+const CACHE_NAME = "hubsync-cache-v5";
 const OFFLINE_PAGE = "/static/offline.html";
 const URLS_TO_CACHE = [
     "/",
@@ -20,19 +20,29 @@ const URLS_TO_CACHE = [
 ];
 
 self.addEventListener("install", (event) => {
+    console.log('Service Worker installing...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('Caching offline page and resources');
-                // Cache the offline page first
+                console.log('Opened cache:', CACHE_NAME);
+                console.log('Caching offline page:', OFFLINE_PAGE);
                 return cache.add(OFFLINE_PAGE)
                     .then(() => {
-                        // Then cache other resources, but don't fail if some fail
+                        console.log('Successfully cached offline page');
+                        // Try to cache other resources but don't fail the install
+                        const otherUrls = URLS_TO_CACHE.filter(url => url !== OFFLINE_PAGE);
                         return Promise.allSettled(
-                            URLS_TO_CACHE.filter(url => url !== OFFLINE_PAGE)
-                                .map(url => cache.add(url).catch(err => console.warn('Failed to cache:', url, err)))
+                            otherUrls.map(url =>
+                                cache.add(url)
+                                    .then(() => console.log('Cached:', url))
+                                    .catch(err => console.warn('Failed to cache:', url, err))
+                            )
                         );
                     });
+            })
+            .catch(err => {
+                console.error('Failed to open cache or cache offline page:', err);
+                throw err;
             })
     );
     self.skipWaiting();
@@ -62,24 +72,31 @@ self.addEventListener("fetch", (event) => {
 
     // Only handle navigation requests (HTML pages)
     if (event.request.mode === 'navigate') {
+        console.log('Navigation request:', event.request.url);
         event.respondWith(
             fetch(event.request)
+                .then(response => {
+                    console.log('Navigation fetch successful:', event.request.url);
+                    return response;
+                })
                 .catch(() => {
-                    // If request fails, serve offline page
-                    console.log('Serving offline page for navigation:', event.request.url);
+                    console.log('Navigation fetch failed, serving offline page for:', event.request.url);
                     return caches.match(OFFLINE_PAGE)
                         .then(response => {
                             if (response) {
+                                console.log('Found offline page in cache');
                                 return response;
                             }
+                            console.log('Offline page not found in cache, serving fallback');
                             // Fallback if offline page not in cache
                             return new Response(
                                 `<!DOCTYPE html>
-                                <html><head><title>Offline</title></head>
+                                <html><head><title>Offline - HubSync</title></head>
                                 <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
                                     <h1>No Internet Connection</h1>
                                     <p>Please check your connection and try again.</p>
                                     <button onclick="window.location.reload()">Retry</button>
+                                    <p><small>Service Worker fallback</small></p>
                                 </body></html>`,
                                 { headers: { 'Content-Type': 'text/html' } }
                             );
