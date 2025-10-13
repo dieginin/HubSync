@@ -1,4 +1,4 @@
-const CACHE_NAME = "hubsync-cache-v1";
+const CACHE_NAME = "hubsync-cache-v2";
 const URLS_TO_CACHE = [
     "/",
     "/static/site.webmanifest",
@@ -14,37 +14,19 @@ const URLS_TO_CACHE = [
     "/static/js/navbar-manager.js",
     "/static/js/password-toggle.js",
     "/static/js/service-worker.js",
-    "/static/js/theme-manager.js",
-    "/offline"
+    "/static/js/theme-manager.js"
 ];
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(URLS_TO_CACHE);
-        })
-    );
-});
-
-self.addEventListener("activate", (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((name) => {
-                    if (name !== CACHE_NAME) {
-                        return caches.delete(name);
-                    }
-                })
-            );
-        })
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(URLS_TO_CACHE))
     );
 });
 
 self.addEventListener("fetch", (event) => {
     event.respondWith(
-        fetch(event.request).catch(async () => {
-            const response = await caches.match(event.request);
-            return response || caches.match("/offline");
-        })
+        caches.match(event.request)
+            .then((response) => response || fetch(event.request))
     );
 });
