@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import redirect, url_for
+from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from werkzeug import Response
 
@@ -35,10 +35,8 @@ def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs) -> Response | str:
         if not current_user.is_admin():
-            from flask import flash
-
             flash("Access denied. Admin privileges required", "danger")
-            return redirect(url_for("main.home"))
+            return redirect(request.referrer or url_for("main.home"))
         return f(*args, **kwargs)
 
     return decorated_function
