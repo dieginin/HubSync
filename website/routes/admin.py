@@ -41,7 +41,7 @@ def staff() -> Response | str:
 @login_required
 @admin_only
 def edit_staff_member(user_id: int) -> Response:
-    name = request.form.get("display_name", "").strip().title()
+    name = request.form.get("name", "").strip().title()
     email = request.form.get("email", "")
     username = request.form.get("username", "")
     role = request.form.get("role", "member")

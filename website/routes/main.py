@@ -21,7 +21,7 @@ def settings() -> str:
         form_type = request.form.get("form_type")
 
         if form_type == "profile":
-            display_name = request.form.get("display_name", "").strip()
+            display_name = request.form.get("name", "").strip()
             username = request.form.get("username", "")
             email = request.form.get("email", "")
 
