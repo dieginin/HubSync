@@ -30,6 +30,23 @@ class PullToRefresh {
         this.bindEvents();
     }
 
+    /**
+     * Check if there's an active modal (Bootstrap modal detection)
+     * @returns {boolean} True if a modal is currently open
+     */
+    isModalOpen() {
+        // Check for Bootstrap modals that are currently shown
+        const activeModal = document.querySelector('.modal.show');
+
+        // Also check for any element with modal-open class on body (Bootstrap adds this)
+        const bodyHasModalOpen = document.body.classList.contains('modal-open');
+
+        // Check for any backdrop (Bootstrap modal backdrop)
+        const hasModalBackdrop = document.querySelector('.modal-backdrop');
+
+        return activeModal || bodyHasModalOpen || hasModalBackdrop;
+    }
+
     createElements() {
         // Check if elements already exist to prevent duplication
         if (this.container.querySelector('.pull-to-refresh-indicator') ||
@@ -99,6 +116,9 @@ class PullToRefresh {
     handleTouchStart(e) {
         if (!this.isEnabled || this.isRefreshing) return;
 
+        // Check if there's an active modal (Bootstrap modal detection)
+        if (this.isModalOpen()) return;
+
         // Check if we're at the top of the page
         this.isAtTop = (window.scrollY === 0 || document.documentElement.scrollTop === 0) &&
             this.container.scrollTop === 0;
@@ -111,6 +131,9 @@ class PullToRefresh {
 
     handleTouchMove(e) {
         if (!this.isEnabled || this.isRefreshing) return;
+
+        // Check if there's an active modal (Bootstrap modal detection)
+        if (this.isModalOpen()) return;
 
         // Check if we're still at the top
         const isCurrentlyAtTop = (window.scrollY === 0 || document.documentElement.scrollTop === 0) &&
@@ -155,6 +178,9 @@ class PullToRefresh {
     handleMouseDown(e) {
         if (!this.isEnabled || this.isRefreshing) return;
 
+        // Check if there's an active modal (Bootstrap modal detection)
+        if (this.isModalOpen()) return;
+
         // Check if we're at the top of the page
         this.isAtTop = (window.scrollY === 0 || document.documentElement.scrollTop === 0) &&
             this.container.scrollTop === 0;
@@ -168,6 +194,9 @@ class PullToRefresh {
 
     handleMouseMove(e) {
         if (!this.isEnabled || this.isRefreshing || !this.isDragging) return;
+
+        // Check if there's an active modal (Bootstrap modal detection)
+        if (this.isModalOpen()) return;
 
         // Check if we're still at the top
         const isCurrentlyAtTop = (window.scrollY === 0 || document.documentElement.scrollTop === 0) &&
