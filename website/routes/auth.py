@@ -109,7 +109,7 @@ def forgot_password() -> Response | str:
 
 @auth.route("/reset_password/<token>", methods=["GET", "POST"])
 @login_only_if_configured
-def reset_password(token) -> Response | str:
+def reset_password(token: str) -> Response | str:
     email, reset_token = db_manager.verify_reset_password_token(token)
     if not email:
         flash("The link is invalid or has expired.", "danger")
