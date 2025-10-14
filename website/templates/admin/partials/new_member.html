@@ -1,0 +1,53 @@
+<div class="modal fade" id="newMember" tabindex="-1" aria-labelledby="newMemberLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="newMemberLabel">Add Staff Member</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-member-form" method="POST">
+                    <div class="form-group mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name"
+                            required minlength="2">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email"
+                            required minlength="5" oninput="this.value = this.value.replace(/\s/g, '')">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Enter a username" required minlength="2"
+                            oninput="this.value = this.value.replace(/\s/g, '')">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role" {% if current_user.role !='superadmin'
+                            %}disabled{% endif %}>
+                            <option value="member" selected>Member</option>
+                            <option value="admin" {% if current_user.role !='superadmin' %}disabled{% endif %}>Admin
+                            </option>
+                            <option value="superadmin" {% if current_user.role !='superadmin' %}disabled{% endif %}>
+                                Super Admin</option>
+                        </select>
+                        {% if current_user.role != 'superadmin' %}
+                        <!-- Hidden input to ensure 'member' role when form is submitted -->
+                        <input type="hidden" name="role" value="member">
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Only Super Admins can assign Admin or Super Admin roles
+                        </small>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="add-member-form" class="btn btn-primary">Add Member</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

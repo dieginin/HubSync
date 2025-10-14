@@ -1,0 +1,25 @@
+<div class="modal fade" id="deleteMember{{ member.id }}" tabindex="-1"
+    aria-labelledby="deleteMemberLabel{{ member.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deleteMemberLabel{{ member.id }}">Delete Staff Member</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Are you sure you want to delete <strong>{{ member.display_name }}</strong>?</p>
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    This action cannot be undone. All data associated with this user will be permanently
+                    deleted.
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <form method="POST" action="{{ url_for('admin.delete_staff_member', user_id=member.id) }}">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
