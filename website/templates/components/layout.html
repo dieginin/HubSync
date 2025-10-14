@@ -1,0 +1,23 @@
+{% macro buttons_block(buttons) %}
+<div class="d-grid">
+    {% for button in buttons %}
+    {{ button|safe }}
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro logo(margin_below="mb-5") %}
+<div class="text-center {{ margin_below }} mt-5">
+    <img src="{{ url_for('static', filename='images/hubsync_logo.png') }}" alt="HubSync Logo" width="225">
+</div>
+{% endmacro %}
+
+{% macro role_badge(role) %}
+{% if role == 'superadmin' %}
+<span class="badge rounded-pill bg-superadmin">{{ role }}</span>
+{% elif role == 'admin' %}
+<span class="badge rounded-pill bg-admin">{{ role }}</span>
+{% else %}
+<span class="badge rounded-pill bg-member">{{ role }}</span>
+{% endif %}
+{% endmacro %}

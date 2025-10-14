@@ -1,26 +1,20 @@
 {% extends "base.html" %}
-
 {% block title %}Staff | HubSync{% endblock %}
+
+{% from "components/buttons.html" import modal_button %}
+{% from "components/inputs.html" import name_input, email_input, role_input, username_input %}
+{% from "components/layout.html" import buttons_block, role_badge %}
 
 {% block content %}
 <div data-pull-to-refresh>
-    <div class="d-grid">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newMember">
-            Add Staff Member
-        </button>
-    </div>
+    {{ buttons_block([modal_button("Add Staff Member", "newMember")]) }}
+
     <ul class="list-group list-group-flush mt-2" id="staff-list">
         {% for member in staff if member.id != 1 and current_user.id != member.id %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {{ member.display_name }}&emsp;
-                {% if member.role == 'superadmin' %}
-                <span class="badge rounded-pill bg-superadmin">{{ member.role }}</span>
-                {% elif member.role == 'admin' %}
-                <span class="badge rounded-pill bg-admin">{{ member.role }}</span>
-                {% else %}
-                <span class="badge rounded-pill bg-member">{{ member.role }}</span>
-                {% endif %}
+                {{ role_badge(member.role) }}
             </div>
             <div class="btn-group" role="group" aria-label="Staff Actions">
                 <button type="button" class="btn btn-sm btn-warning" title="Edit" data-bs-toggle="modal"

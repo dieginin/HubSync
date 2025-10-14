@@ -10,32 +10,23 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="display_name" class="form-label">Display Name</label>
-                    <input type="text" class="form-control" id="display_name" name="display_name"
-                        value="{{ current_user.display_name }}" required minlength="2">
+                    {{ name_input(current_user.display_name, current_user.display_name) }}
                     <div class="form-text">Your name as it appears throughout the application.</div>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username"
-                        value="{{ current_user.username }}" required minlength="2"
-                        oninput="this.value = this.value.replace(/\s/g, '')">
+                    {{ username_input(current_user.username, current_user.username) }}
                     <div class="form-text">Your unique username for login.</div>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}"
-                    required oninput="this.value = this.value.replace(/\s/g, '')">
+                {{ email_input(current_user.email, current_user.email) }}
                 <div class="form-text">Your email address for login and notifications.</div>
             </div>
 
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">
-                    Update Profile
-                </button>
-            </div>
+            {{ buttons_block([
+            '<button type="submit" class="btn btn-primary">Update Profile</button>'
+            ]) }}
         </form>
     </div>
 </div>

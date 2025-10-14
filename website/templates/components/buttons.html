@@ -1,0 +1,12 @@
+{% macro modal_button(text, target) %}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ target }}">{{ text|safe
+    }}</button>
+{% endmacro %}
+
+{% macro submit_button(text) %}
+<button type="submit" class="btn btn-primary mt-3">{{ text|safe }}</button>
+{% endmacro %}
+
+{% macro text_button(text, url) %}
+<a href="{{ url_for(url) }}" class="btn btn-link mt-1 btn-sm" role="button">{{ text|safe }}</a>
+{% endmacro %}

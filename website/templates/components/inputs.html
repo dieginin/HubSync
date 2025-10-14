@@ -1,0 +1,64 @@
+{% macro name_input(placeholder="Enter your name", value="") %}
+<div class="form-group mb-2">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="{{ placeholder|safe }}" required
+        minlength="2" value="{{ value|safe }}">
+</div>
+{% endmacro %}
+
+{% macro email_input(placeholder="Enter your email", value="") %}
+<div class="form-group mb-2">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="{{ placeholder|safe }}" required
+        minlength="5" oninput="this.value = this.value.replace(/\s/g, '')" value="{{ value|safe }}">
+</div>
+{% endmacro %}
+
+{% macro email_or_username_input() %}
+<div class="form-group mb-2">
+    <label for="email_or_username" class="form-label">Email or Username</label>
+    <input type="text" class="form-control" id="email_or_username" name="email_or_username"
+        placeholder="Enter your email or username" required minlength="2"
+        oninput="this.value = this.value.replace(/\s/g, '')">
+</div>
+{% endmacro %}
+
+{% macro role_input(current_user_role, leyend, current_role="member") %}
+<div class="form-group mb-3">
+    <label for="role" class="form-label">Role</label>
+    <select class="form-select" id="role" name="role" {% if current_user_role !='superadmin' %}disabled{% endif %}>
+        <option value="member" {{ 'selected' if current_role=='member' }}>Member</option>
+        <option value="admin" {{ 'selected' if current_role=='admin' }}>Admin</option>
+        <option value="superadmin" {{ 'selected' if current_role=='superadmin' }}>Super Admin</option>
+    </select>
+    {% if current_user_role != 'superadmin' %}
+    <input type="hidden" name="role" value="{{ current_role }}">
+    <small class="form-text text-muted">
+        <i class="bi bi-info-circle me-1"></i>{{ leyend }}
+    </small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro password_input(id="password", placeholder="Enter your password") %}
+<div class="form-group mb-2">
+    <label for="{{ id|safe }}" class="form-label">Password</label>
+    <div class="input-group">
+        <input type="password" class="form-control" id="{{ id|safe }}" name="{{ id|safe }}"
+            placeholder="{{ placeholder|safe }}" required minlength="3"
+            oninput="this.value = this.value.replace(/\s/g, '')">
+        <button type="button" class="password-toggle-btn" data-password-toggle
+            onclick="togglePasswordVisibility('{{ id|safe }}', this)">
+            <i class="bi bi-eye"></i>
+        </button>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro username_input(placeholder="Enter a username", value="") %}
+<div class="form-group mb-2">
+    <label for="username" class="form-label">Username</label>
+    <input type="text" class="form-control" id="username" name="username" placeholder="{{ placeholder|safe }}" required
+        minlength="2" oninput="this.value = this.value.replace(/\s/g, '')" value="{{ value|safe }}">
+</div>
+{% endmacro %}

@@ -1,59 +1,26 @@
 {% extends "base.html" %}
 {% block title %}First Setup | HubSync{% endblock %}
 
+{% from "components/buttons.html" import submit_button %}
+{% from "components/inputs.html" import name_input, email_input, password_input, username_input %}
+{% from "components/layout.html" import buttons_block, logo %}
+{% from "components/texts.html" import paragraph, subtitle, title %}
+
 {% block content %}
 <div class="d-flex justify-content-center align-items-center min-vh-100 form-container">
-    <form class="w-100" style="max-width: 400px;" method="POST">
-        <div class="text-center mb-2 mt-5">
-            <img src="{{ url_for('static', filename='images/hubsync_logo.png') }}" alt="HubSync Logo" width="225">
-        </div>
-        <h1 align="center">HubSync</h1>
-        <h3 align="center" class="mb-4">First Time Setup</h3>
-        <p align="center" class="text-nowrap">
-            It seems like this is your first time<br />Let's create your admin account
-        </p>
-        <div class="form-group mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required
-                minlength="2">
-        </div>
-        <div class="form-group mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required
-                minlength="5" oninput="this.value = this.value.replace(/\s/g, '')">
-        </div>
-        <div class="form-group mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Enter a username"
-                required minlength="2" oninput="this.value = this.value.replace(/\s/g, '')">
-        </div>
-        <div class="form-group mb-3">
-            <label for="password1" class="form-label">Password</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="password1" name="password1"
-                    placeholder="Enter a password" required minlength="3"
-                    oninput="this.value = this.value.replace(/\s/g, '')">
-                <button type="button" class="password-toggle-btn" data-password-toggle
-                    onclick="togglePasswordVisibility('password1', this)">
-                    <i class="bi bi-eye"></i>
-                </button>
-            </div>
-        </div>
-        <div class="form-group mb-3">
-            <label for="password2" class="form-label">Confirm Password</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="password2" name="password2"
-                    placeholder="Confirm your password" required minlength="3"
-                    oninput="this.value = this.value.replace(/\s/g, '')">
-                <button type="button" class="password-toggle-btn" data-password-toggle
-                    onclick="togglePasswordVisibility('password2', this)">
-                    <i class="bi bi-eye"></i>
-                </button>
-            </div>
-        </div>
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary mt-3">Set Up Account</button>
-        </div>
+    <form class="w-100" style="max-width: 350px;" method="POST">
+        {{ logo("mb-2") }}
+        {{ title("HubSync", false) }}
+        {{ subtitle("First Time Setup") }}
+        {{ paragraph("It seems like this is your first time<br>Let's create your admin account") }}
+
+        {{ name_input() }}
+        {{ email_input() }}
+        {{ username_input() }}
+        {{ password_input(id="password1", placeholder="Enter a password") }}
+        {{ password_input(id="password2", placeholder="Confirm your password") }}
+
+        {{ buttons_block([submit_button("Set Up Account")]) }}
     </form>
 </div>
 {% endblock %}

@@ -9,42 +9,10 @@
             <div class="modal-body">
                 <form id="edit-form-{{ member.id }}" method="POST"
                     action="{{ url_for('admin.edit_staff_member', user_id=member.id) }}">
-                    <div class="mb-3">
-                        <label for="display_name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="display_name" name="display_name"
-                            value="{{ member.display_name }}" required minlength="2">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ member.email }}"
-                            required minlength="5" oninput="this.value = this.value.replace(/\s/g, '')">
-                    </div>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username"
-                            value="{{ member.username }}" required minlength="2"
-                            oninput="this.value = this.value.replace(/\s/g, '')">
-                    </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" name="role" required {% if current_user.role
-                            !='superadmin' %}disabled{% endif %}>
-                            <option value="superadmin" {% if member.role=='superadmin' %}selected{% endif %}>
-                                Super
-                                Admin</option>
-                            <option value="admin" {% if member.role=='admin' %}selected{% endif %}>Admin
-                            </option>
-                            <option value="member" {% if member.role=='member' %}selected{% endif %}>Member
-                            </option>
-                        </select>
-                        {% if current_user.role != 'superadmin' %}
-                        <input type="hidden" name="role" value="{{ member.role }}">
-                        <small class="form-text text-muted">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Only Super Admins can change user roles
-                        </small>
-                        {% endif %}
-                    </div>
+                    {{ name_input(member.display_name, member.display_name) }}
+                    {{ email_input(member.email, member.email) }}
+                    {{ username_input(member.username, member.username) }}
+                    {{ role_input(current_user.role, "Only Super Admins can change user roles", member.role) }}
                 </form>
             </div>
             <div class="modal-footer justify-content-center">

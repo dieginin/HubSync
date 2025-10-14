@@ -1,6 +1,8 @@
 {% extends "base.html" %}
-
 {% block title %}Settings | HubSync{% endblock %}
+
+{% from "components/inputs.html" import name_input, email_input, password_input, username_input %}
+{% from "components/layout.html" import buttons_block, role_badge %}
 
 {% block content %}
 <div class="container mb-5">

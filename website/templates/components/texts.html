@@ -1,0 +1,11 @@
+{% macro paragraph(text) %}
+<p align="center" class="text-nowrap">{{ text|safe }}</p>
+{% endmacro %}
+
+{% macro subtitle(text) %}
+<h3 align="center" class="mb-4">{{ text|safe }}</h3>
+{% endmacro %}
+
+{% macro title(text, with_space=true) %}
+<h1 align="center" class="{% if with_space %}mb-4{% endif %}">{{ text|safe }}</h1>
+{% endmacro %}
