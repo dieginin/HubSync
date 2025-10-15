@@ -1,5 +1,6 @@
-{% macro modal_button(text, target) %}
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ target }}">
+{% macro modal_button(text, target, color="primary", title="") %}
+<button type="button" class="btn btn-{{ color }}" data-bs-toggle="modal" data-bs-target="#{{ target }}"
+    title="{{ title }}">
     {{ text|safe }}
 </button>
 {% endmacro %}
