@@ -1,6 +1,7 @@
 {% macro modal_button(text, target) %}
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ target }}">{{ text|safe
-    }}</button>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ target }}">
+    {{ text|safe }}
+</button>
 {% endmacro %}
 
 {% macro submit_button(text) %}
