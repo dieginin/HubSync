@@ -28,11 +28,15 @@ class Pot(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     light_id: Mapped[int] = mapped_column(ForeignKey("lights.id"))
     strain_id: Mapped[int] = mapped_column(ForeignKey("strains.id"), nullable=True)
-    strain: Mapped[Strain] = relationship()
+    strain: Mapped[Strain] = relationship(cascade="save-update")
 
     def __init__(self, light_id: int) -> None:
         super().__init__()
         self.light_id = light_id
+
+    @property
+    def is_on(self) -> bool:
+        return self.strain_id is not None
 
 
 class Light(db.Model):
@@ -42,7 +46,7 @@ class Light(db.Model):
     tray_id: Mapped[int] = mapped_column(ForeignKey("trays.id"))
     width: Mapped[int] = mapped_column()
     height: Mapped[int] = mapped_column()
-    pots: Mapped[list[Pot]] = relationship()
+    pots: Mapped[list[Pot]] = relationship(cascade="all, delete-orphan")
 
     def __init__(self, tray_id: int, width: int, height: int, pots: list[Pot]) -> None:
         super().__init__()
@@ -60,7 +64,7 @@ class Tray(db.Model):
     name: Mapped[str] = mapped_column()
     planted_date: Mapped[datetime | None] = mapped_column()
     harvest_date: Mapped[datetime | None] = mapped_column()
-    lights: Mapped[list[Light]] = relationship()
+    lights: Mapped[list[Light]] = relationship(cascade="all, delete-orphan")
 
     def __init__(
         self, room_id: int, name: str, num_of_lights: int, width: int, height: int
