@@ -9,41 +9,55 @@
 {% block content %}
 <div data-pull-to-refresh>
     <div class="row g-1 mb-3">
-        <div class="col-1 d-grid">
+        <div class="col d-grid">
             <a href="{{ url_for('room.layouts') }}" class="btn btn-secondary" title="Go Back">
-                <i class="bi bi-chevron-left"></i>
+                <i class="bi bi-chevron-left"></i>{% if not current_user.is_admin() %} Go Back{% endif %}
             </a>
         </div>
         {% if current_user.is_admin() %}
-        <div class="col d-grid">
+        <div class="col-10 d-grid">
             {{ modal_button("Add Tray", "newTray") }}
         </div>
-        {% endif %}
         <div class="col-1 d-grid">
             {{ modal_button("<i class='bi bi-pencil-fill'></i>", "editRoom", "warning", "Edit Room") }}
         </div>
+        {% endif %}
     </div>
     {{ title("Room " ~ room.name) }}
 
     {% for tray in room.trays %}
-    <div class="tray">
-        <h2>{{ tray.name }}</h2>
+    <div class="card text-center mb-3">
+        <div class="card-body">
+            {% set rows = tray.lights[0].height %}
+            {% set cols = tray.lights[0].width %}
+            {% set num_lights = tray.lights|length %}
+            <h2 class="card-title">{{ tray.name }}
+            </h2>
 
-        <div class="lights-container">
-            {% for light in tray.lights %}
-            <div class="light-column">
-                <div class="light-grid" style="--grid-width: {{ light.width }}; --grid-height: {{ light.height }};">
-                    {% for pot in light.pots %}
-                    <div class="pot">
-                        <span class="pot-id">{{ pot.id }}</span>
-                        {% if pot.strain %}
-                        <span class="strain-initials">{{ pot.strain.initials }}</span>
-                        {% else %}
-                        <span class="strain-initials text-muted">N/A</span>
-                        {% endif %}
+            {% for row_index in range(cols) %}
+            <div class="row g-1">
+                {% for light in tray.lights %}
+                {% for col_index in range(rows) %}
+                {% set pot_index = col_index * cols + row_index %}
+                {% set pot = light.pots[pot_index] %}
+                <div class="col">
+                    <div class="card {% if pot.is_on %}bg-success{% else %}bg-secondary{% endif %} text-white">
+                        <div class="card-body p-1" style="font-size: 0.8rem;">
+                            {% if pot.is_on %}
+                            <i class="bi bi-lightbulb-fill"></i> On<br>
+                            {% else %}
+                            <i class="bi bi-lightbulb"></i> Off<br>
+                            {% endif %}
+                            {% if pot.strain %}
+                            {{ pot.strain.initials }}
+                            {% else %}
+                            No plant
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
+                {% endfor %}
             </div>
             {% endfor %}
         </div>
