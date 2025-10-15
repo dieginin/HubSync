@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from website.utils import Role
 
 if TYPE_CHECKING:
-    from website.models import PasswordResetToken, User
+    from website.models import PasswordResetToken, Room, User
 
 
 class Response:
@@ -175,6 +175,97 @@ class DatabaseManager:
 
         user = self.get_user_by_id(reset_token.user_id)
         return (user.email, reset_token) if user else (None, None)
+
+    def get_room_by_id(self, room_id: int) -> "Room | None":
+        from website.models import Room
+
+        return Room.query.get(room_id)
+
+    def create_room(self, name: str) -> Response:
+        from website.models import Room
+
+        try:
+            if Room.query.filter_by(name=name).first():
+                return Response(type="danger", message="Room already exists")
+            new_room = Room(name)
+            self.db.session.add(new_room)
+            self.db.session.commit()
+            return Response(type="success", message=f"Room {name} created successfully")
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(type="danger", message=f"Error creating room: {str(e)}")
+
+    def delete_room(self, room_id: int) -> Response:
+        try:
+            room = self.get_room_by_id(room_id)
+            if not room:
+                return Response(type="danger", message="Room not found")
+
+            self.db.session.delete(room)
+            self.db.session.commit()
+            return Response(
+                type="success", message=f"Room {room.name} deleted successfully"
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(type="danger", message=f"Error deleting room: {str(e)}")
+
+    def update_room_name(self, room_id: int, new_name: str) -> Response:
+        from website.models import Room
+
+        try:
+            room = self.get_room_by_id(room_id)
+            if not room:
+                return Response(type="danger", message="Room not found")
+
+            if Room.query.filter_by(name=new_name).first():
+                return Response(type="danger", message="Room name already exists")
+
+            room.name = new_name
+            self.db.session.commit()
+            return Response(
+                type="success", message=f"Room {new_name} updated successfully"
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(
+                type="danger", message=f"Error updating room name: {str(e)}"
+            )
+
+    def add_tray_to_room(
+        self, room_id: int, tray_name: str, num_of_lights: int, width: int, height: int
+    ) -> Response:
+        from website.models.room import Light, Pot, Tray
+
+        try:
+            room = self.get_room_by_id(room_id)
+            if not room:
+                return Response(type="danger", message="Room not found")
+
+            id = max(len(room.trays), 0) + 1
+            lights = [
+                Light(
+                    i + 1, width, height, [Pot(id=j + 1) for j in range(width * height)]
+                )
+                for i in range(num_of_lights)
+            ]
+            tray = Tray(id, tray_name, lights)
+
+            room.trays.append(tray)  # TODO No agrega
+            self.db.session.commit()
+            return Response(
+                type="success",
+                message=f"Tray {tray_name} added to {room.name} successfully",
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(
+                type="danger", message=f"Error adding tray to room: {str(e)}"
+            )
 
     # Database Management Methods
     def create_tables(self, app: Flask) -> None:

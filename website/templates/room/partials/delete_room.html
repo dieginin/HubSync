@@ -1,0 +1,25 @@
+<div class="modal fade" id="deleteRoom{{ room.id }}" tabindex="-1" aria-labelledby="deleteRoomLabel{{ room.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deleteRoomLabel{{ room.id }}">Delete Room</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Are you sure you want to delete <strong>{{ room.name }}</strong>?</p>
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    This action cannot be undone. All data associated with this room will be permanently
+                    deleted.
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <form method="POST" action="{{ url_for('room.delete_room', room_id=room.id) }}">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room.name }} Layout | HubSync{% endblock %}
+
+{% from "components/buttons.html" import modal_button %}
+{% from "components/inputs.html" import name_input %}
+{% from "components/texts.html" import title %}
+
+{% block content %}
+<div data-pull-to-refresh>
+    <div class="row g-1 mb-3">
+        <div class="col-1 d-grid">
+            <a href="{{ url_for('room.layouts') }}" class="btn btn-secondary" title="Go Back">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </div>
+        {% if current_user.is_admin() %}
+        <div class="col d-grid">
+            {{ modal_button("Add Tray", "newTray") }}
+        </div>
+        {% endif %}
+        <div class="col-1 d-grid">
+            {{ modal_button("<i class='bi bi-pencil-fill'></i>", "editRoom", "warning", "Edit Room") }}
+        </div>
+    </div>
+    {{ title("Room " ~ room.name) }}
+
+    {% for tray in room.trays %}
+    <div class="tray">
+        <h2>{{ tray.name }}</h2>
+
+        <div class="lights-container">
+            {% for light in tray.lights %}
+            <div class="light-column">
+                <div class="light-grid" style="--grid-width: {{ light.width }}; --grid-height: {{ light.height }};">
+                    {% for pot in light.pots %}
+                    <div class="pot">
+                        <span class="pot-id">{{ pot.id }}</span>
+                        {% if pot.strain %}
+                        <span class="strain-initials">{{ pot.strain.initials }}</span>
+                        {% else %}
+                        <span class="strain-initials text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="w-100 text-center text-muted">No trays found</div>
+    {% endfor %}
+</div>
+
+{% include 'room/partials/edit_room.html' %}
+{% include 'room/partials/new_tray.html' %}
+
+<script src="{{ url_for('static', filename='js/pull-to-refresh.js') }}"></script>
+{% endblock %}

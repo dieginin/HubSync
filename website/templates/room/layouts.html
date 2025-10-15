@@ -2,11 +2,56 @@
 
 {% block title %}Layouts | HubSync{% endblock %}
 
+{% from "components/buttons.html" import modal_button %}
+{% from "components/inputs.html" import name_input %}
+{% from "components/layout.html" import buttons_block %}
+
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="text-center">
-        <h1 class="display-4 mb-4">Room Layouts</h1>
-        <p class="lead text-muted mb-4">Under Construction</p>
+<div data-pull-to-refresh>
+    {% if current_user.is_admin() %}
+    {{ buttons_block([ modal_button("Add Room", "newRoom") ]) }}
+    {% endif %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 mt-1 g-3">
+        {% for room in rooms %}
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">{{ room.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">Trays count: {{ room.trays|length }}</h6>
+                    <p class="card-text">
+                        {% if room.is_planted %}
+                        Planted date: {{ room.planted_date }}<br>Harvest date: {{ room.harvest_date }}
+                        {% else %}
+                        Room is not planted yet
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('room.view_room', room_id=room.id) }}" class="btn btn-primary">Layout</a>
+                    {% if current_user.role == "superadmin" %}
+                    <button type="button" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
+                        data-bs-target="#deleteRoom{{ room.id }}">
+                        <i class="bi bi-trash-fill" style="font-size: 1.1rem;"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-body-secondary">
+                    {% if room.is_planted %}
+                    {{ room.days_since_planted }} days since <strong>planted</strong><br>
+                    {{ room.days_for_harvest }} days for <strong>harvest</strong>
+                    {% else %}
+                    Not planted
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% include 'room/partials/delete_room.html' %}
+        {% else %}
+        <div class="w-100 text-center text-muted">No rooms found</div>
+        {% endfor %}
     </div>
 </div>
+
+{% include 'room/partials/new_room.html' %}
+
+<script src="{{ url_for('static', filename='js/pull-to-refresh.js') }}"></script>
 {% endblock %}
