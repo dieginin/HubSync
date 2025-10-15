@@ -238,23 +238,15 @@ class DatabaseManager:
     def add_tray_to_room(
         self, room_id: int, tray_name: str, num_of_lights: int, width: int, height: int
     ) -> Response:
-        from website.models.room import Light, Pot, Tray
+        from website.models import Tray
 
         try:
             room = self.get_room_by_id(room_id)
             if not room:
                 return Response(type="danger", message="Room not found")
 
-            id = max(len(room.trays), 0) + 1
-            lights = [
-                Light(
-                    i + 1, width, height, [Pot(id=j + 1) for j in range(width * height)]
-                )
-                for i in range(num_of_lights)
-            ]
-            tray = Tray(id, tray_name, lights)
-
-            room.trays.append(tray)  # TODO No agrega
+            tray = Tray(room.id, tray_name, num_of_lights, width, height)
+            self.db.session.add(tray)
             self.db.session.commit()
             return Response(
                 type="success",

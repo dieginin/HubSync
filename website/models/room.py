@@ -1,13 +1,16 @@
-from dataclasses import dataclass
 from datetime import datetime
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from website import db
 
 
-@dataclass
-class Strain:
-    id: int
-    name: str
+class Strain(db.Model):
+    __tablename__ = "strains"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
 
     @property
     def initials(self) -> str:
@@ -19,27 +22,61 @@ class Strain:
         return self.name[0].upper()
 
 
-@dataclass
-class Pot:
-    id: int
-    strain: Strain | None = None
+class Pot(db.Model):
+    __tablename__ = "pots"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    light_id: Mapped[int] = mapped_column(ForeignKey("lights.id"))
+    strain_id: Mapped[int] = mapped_column(ForeignKey("strains.id"), nullable=True)
+    strain: Mapped[Strain] = relationship()
+
+    def __init__(self, light_id: int) -> None:
+        super().__init__()
+        self.light_id = light_id
 
 
-@dataclass
-class Light:
-    id: int
-    width: int
-    height: int
-    pots: list[Pot]
+class Light(db.Model):
+    __tablename__ = "lights"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tray_id: Mapped[int] = mapped_column(ForeignKey("trays.id"))
+    width: Mapped[int] = mapped_column()
+    height: Mapped[int] = mapped_column()
+    pots: Mapped[list[Pot]] = relationship()
+
+    def __init__(self, tray_id: int, width: int, height: int, pots: list[Pot]) -> None:
+        super().__init__()
+        self.tray_id = tray_id
+        self.width = width
+        self.height = height
+        self.pots = pots
 
 
-@dataclass
-class Tray:
-    id: int
-    name: str
-    lights: list[Light]
-    planted_date: datetime | None = None
-    harvest_date: datetime | None = None
+class Tray(db.Model):
+    __tablename__ = "trays"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
+    name: Mapped[str] = mapped_column()
+    planted_date: Mapped[datetime | None] = mapped_column()
+    harvest_date: Mapped[datetime | None] = mapped_column()
+    lights: Mapped[list[Light]] = relationship()
+
+    def __init__(
+        self, room_id: int, name: str, num_of_lights: int, width: int, height: int
+    ) -> None:
+        super().__init__()
+        self.room_id = room_id
+        self.name = name
+        self.lights = [
+            Light(
+                self.id,
+                width,
+                height,
+                [Pot(i + 1) for j in range(width * height)],
+            )
+            for i in range(num_of_lights)
+        ]
 
     @property
     def is_planted(self) -> bool:
@@ -59,14 +96,15 @@ class Tray:
 
 
 class Room(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
-    trays = db.Column(db.PickleType)
+    __tablename__ = "rooms"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    trays: Mapped[list[Tray]] = relationship(cascade="all, delete-orphan")
 
     def __init__(self, name: str) -> None:
         super().__init__()
         self.name = name
-        self.trays: list[Tray] = []
 
     @property
     def is_planted(self) -> bool:
