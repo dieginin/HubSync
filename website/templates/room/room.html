@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ room.name }} Layout | HubSync{% endblock %}
+{% block title %}Room {{ room.name }} | HubSync{% endblock %}
 
 {% from "components/buttons.html" import modal_button %}
 {% from "components/inputs.html" import name_input %}
@@ -15,10 +15,10 @@
             </a>
         </div>
         {% if current_user.is_admin() %}
-        <div class="col-10 d-grid">
+        <div class="col-9 d-grid">
             {{ modal_button("Add Tray", "newTray") }}
         </div>
-        <div class="col-1 d-grid">
+        <div class="col d-grid">
             {{ modal_button("<i class='bi bi-pencil-fill'></i>", "editRoom", "warning", "Edit Room") }}
         </div>
         {% endif %}
@@ -28,43 +28,48 @@
     {% for tray in room.trays %}
     <div class="card text-center mb-3">
         <div class="card-body">
-            {% set rows = tray.lights[0].height %}
-            {% set cols = tray.lights[0].width %}
-            {% set num_lights = tray.lights|length %}
-            <h2 class="card-title">{{ tray.name }}
-            </h2>
+            {% set height = tray.lights[0].height %}
+            {% set total_cols = tray.lights | map(attribute='width') | sum %}
 
-            {% for row_index in range(cols) %}
-            <div class="row g-1">
-                {% for light in tray.lights %}
-                {% for col_index in range(rows) %}
-                {% set pot_index = col_index * cols + row_index %}
-                {% set pot = light.pots[pot_index] %}
-                <div class="col">
-                    <div class="card {% if pot.is_on %}bg-success{% else %}bg-secondary{% endif %} text-white">
-                        <div class="card-body p-1" style="font-size: 0.8rem;">
-                            {% if pot.is_on %}
-                            <i class="bi bi-lightbulb-fill"></i> On<br>
-                            {% else %}
-                            <i class="bi bi-lightbulb"></i> Off<br>
-                            {% endif %}
-                            {% if pot.strain %}
-                            {{ pot.strain.initials }}
-                            {% else %}
-                            No plant
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% endfor %}
+            {% set all_pots = [] %}
+            {% for light in tray.lights %}
+            {% for pot in light.pots %}
+            {% set _ = all_pots.append(pot) %}
+            {% endfor %}
+            {% endfor %}
+
+            {% if current_user.is_admin() %}
+            <i class="bi bi-pencil-fill text-warning float-start" role="button" title="Edit Tray" data-bs-toggle="modal"
+                data-bs-target="#editTray{{ tray.id }}"></i>
+            {% if current_user.role == 'superadmin' %}
+            <i class="bi bi-trash-fill text-danger float-end" role="button" title="Delete Tray" data-bs-toggle="modal"
+                data-bs-target="#deleteTray{{ tray.id }}"></i>
+            {% include 'room/partials/delete_tray.html' %}
+            {% endif %}
+            {% include 'room/partials/edit_tray.html' %}
+            {% endif %}
+            <h2 class="card-title">{{ tray.name }}</h2>
+            <div class="light-grid" style="--grid-width: {{ total_cols }}; --grid-height: {{ height }};">
+                {% for row in range(height) %}
+                {% for col in range(total_cols) %}
+                {% set idx = col * height + row %}
+                {% if idx < all_pots|length %} {% set pot=all_pots[idx] %} <div class="pot">
+                    {% if pot.strain %}
+                    <span class="strain-initials" title="{{ pot.strain.name }}">{{ pot.strain.initials }}</span>
+                    {% else %}
+                    <span class="no-strain">N/S</span>
+                    {% endif %}
             </div>
+            {% endif %}
+            {% endfor %}
             {% endfor %}
         </div>
+
     </div>
-    {% else %}
-    <div class="w-100 text-center text-muted">No trays found</div>
-    {% endfor %}
+</div>
+{% else %}
+<div class="w-100 text-center text-muted">No trays found</div>
+{% endfor %}
 </div>
 
 {% include 'room/partials/edit_room.html' %}
