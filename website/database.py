@@ -259,6 +259,48 @@ class DatabaseManager:
                 type="danger", message=f"Error adding tray to room: {str(e)}"
             )
 
+    def edit_tray(
+        self, tray_id: int, tray_name: str, num_of_lights: int, width: int, height: int
+    ) -> Response:
+        from website.models import Tray
+
+        try:
+            tray = Tray.query.get(tray_id)
+            if not tray:
+                return Response(type="danger", message="Tray not found")
+
+            tray.name = tray_name
+            tray.num_of_lights = num_of_lights
+            tray.width = width
+            tray.height = height
+            self.db.session.commit()
+            return Response(
+                type="success",
+                message=f"Tray {tray_name} updated successfully",
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(type="danger", message=f"Error updating tray: {str(e)}")
+
+    def delete_tray(self, tray_id: int) -> Response:
+        from website.models import Tray
+
+        try:
+            tray = Tray.query.get(tray_id)
+            if not tray:
+                return Response(type="danger", message="Tray not found")
+
+            self.db.session.delete(tray)
+            self.db.session.commit()
+            return Response(
+                type="success", message=f"Tray {tray.name} deleted successfully"
+            )
+
+        except Exception as e:
+            self.db.session.rollback()
+            return Response(type="danger", message=f"Error deleting tray: {str(e)}")
+
     # Database Management Methods
     def create_tables(self, app: Flask) -> None:
         with app.app_context():

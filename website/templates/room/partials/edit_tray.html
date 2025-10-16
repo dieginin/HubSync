@@ -1,0 +1,45 @@
+<div class="modal fade" id="editTray{{ tray.id }}" tabindex="-1" aria-labelledby="editTray{{ tray.id }}Label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editTray{{ tray.id }}Label">Edit Tray</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-tray-{{ tray.id }}" method="POST"
+                    action="{{ url_for('room.edit_tray', room_id=room.id, tray_id=tray.id) }}">
+                    {{ name_input("Enter tray name", tray.name) }}
+                    <div class="form-group row row-cols-2">
+                        <div class="col text-center">
+                            <label for="num_of_lights" class="form-label">Number of Lights</label>
+                            <input type="number" class="form-control" id="num_of_lights" name="num_of_lights"
+                                value="{{ tray.lights|length }}" required min="1" max="15">
+                        </div>
+                        <div class="col text-center">
+                            <label for="num_of_pots" class="form-label">Matrix per Light</label>
+
+                            <div class="row row-cols-3">
+                                <div class="col-5">
+                                    <input type="number" class="form-control" id="width" name="width"
+                                        value="{{ tray.lights[0].width }}" required min="1" max="8">
+                                    <small for="width" class="form-label">Width</small>
+                                </div>
+                                <div class="col-1 align-self-center text-muted">x</div>
+                                <div class="col-5">
+                                    <input type="number" class="form-control" id="height" name="height"
+                                        value="{{ tray.lights[0].height }}" required min="1" max="8">
+                                    <small for="height" class="form-label">Height</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="edit-tray-{{ tray.id }}" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

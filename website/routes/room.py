@@ -51,3 +51,23 @@ def add_tray(room_id: int) -> Response:
         )
         flash(response.message, response.type)
     return redirect(url_for("room.view_room", room_id=room_id))
+
+
+@room.route("/layouts/<int:room_id>/edit_tray/<int:tray_id>", methods=["POST"])
+@login_required
+def edit_tray(room_id: int, tray_id: int) -> Response:
+    tray_name = request.form.get("name", "").strip().upper()
+    num_of_lights = request.form.get("num_of_lights", 4, type=int)
+    width = request.form.get("width", 3, type=int)
+    height = request.form.get("height", 3, type=int)
+    response = db_manager.edit_tray(tray_id, tray_name, num_of_lights, width, height)
+    flash(response.message, response.type)
+    return redirect(url_for("room.view_room", room_id=room_id))
+
+
+@room.route("/layouts/<int:room_id>/delete_tray/<int:tray_id>", methods=["POST"])
+@login_required
+def delete_tray(room_id: int, tray_id: int) -> Response:
+    response = db_manager.delete_tray(tray_id)
+    flash(response.message, response.type)
+    return redirect(url_for("room.view_room", room_id=room_id))
