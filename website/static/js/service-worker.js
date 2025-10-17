@@ -1,7 +1,7 @@
-const CACHE_NAME = "hubsync-cache-v2";
+const CACHE_NAME = "hubsync-cache-v1";
 const URLS_TO_CACHE = [
     "/",
-    "/static/site.webmanifest",
+    "/static/manifest.json",
     "/static/css/themes.css",
     "/static/images/apple-touch-icon.png",
     "/static/images/favicon-96x96.png",
