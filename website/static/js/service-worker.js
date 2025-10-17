@@ -8,8 +8,6 @@ const URLS_TO_CACHE = [
     "/static/images/favicon.ico",
     "/static/images/favicon.svg",
     "/static/images/hubsync_logo.png",
-    "/static/images/web-app-manifest-192x192.png",
-    "/static/images/web-app-manifest-512x512.png",
     "/static/js/auto-alert.js",
     "/static/js/navbar-manager.js",
     "/static/js/password-toggle.js",
