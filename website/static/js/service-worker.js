@@ -1,4 +1,4 @@
-const CACHE_NAME = "hubsync-cache-v1";
+const CACHE_NAME = "hubsync-cache-v99";
 const URLS_TO_CACHE = [
     "/",
     "/static/manifest.json",
