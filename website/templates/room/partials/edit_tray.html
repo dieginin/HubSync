@@ -14,7 +14,7 @@
                         <div class="col text-center">
                             <label for="num_of_lights" class="form-label">Number of Lights</label>
                             <input type="number" class="form-control" id="num_of_lights" name="num_of_lights"
-                                value="{{ tray.lights|length }}" required min="1" max="15">
+                                value="{{ tray.lights|length }}" required min="1" max="6">
                         </div>
                         <div class="col text-center">
                             <label for="num_of_pots" class="form-label">Matrix per Light</label>
@@ -22,13 +22,13 @@
                             <div class="row row-cols-3">
                                 <div class="col-5">
                                     <input type="number" class="form-control" id="width" name="width"
-                                        value="{{ tray.lights[0].width }}" required min="1" max="8">
+                                        value="{{ tray.lights[0].width }}" required min="1" max="5">
                                     <small for="width" class="form-label">Width</small>
                                 </div>
                                 <div class="col-1 align-self-center text-muted">x</div>
                                 <div class="col-5">
                                     <input type="number" class="form-control" id="height" name="height"
-                                        value="{{ tray.lights[0].height }}" required min="1" max="8">
+                                        value="{{ tray.lights[0].height }}" required min="1" max="5">
                                     <small for="height" class="form-label">Height</small>
                                 </div>
                             </div>
