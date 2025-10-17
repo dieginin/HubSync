@@ -73,12 +73,7 @@ class Tray(db.Model):
         self.room_id = room_id
         self.name = name
         self.lights = [
-            Light(
-                self.id,
-                width,
-                height,
-                [Pot(i + 1) for j in range(width * height)],
-            )
+            Light(self.id, width, height, [Pot(i + 1) for _ in range(width * height)])
             for i in range(num_of_lights)
         ]
 
@@ -97,6 +92,17 @@ class Tray(db.Model):
         if not self.harvest_date:
             return 0
         return (self.harvest_date - datetime.now()).days
+
+    def add_lights(self, ammount: int, width: int, height: int) -> None:
+        for light in range(ammount):
+            self.lights.append(
+                Light(
+                    self.id,
+                    width,
+                    height,
+                    [Pot(light + 1) for j in range(width * height)],
+                )
+            )
 
 
 class Room(db.Model):

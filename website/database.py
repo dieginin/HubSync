@@ -270,9 +270,19 @@ class DatabaseManager:
                 return Response(type="danger", message="Tray not found")
 
             tray.name = tray_name
-            tray.num_of_lights = num_of_lights
-            tray.width = width
-            tray.height = height
+            light = tray.lights[0]
+
+            diff = len(tray.lights) - num_of_lights
+            if diff > 0:
+                tray.lights = tray.lights[0 : len(tray.lights) - diff]
+            elif diff < 0:
+                tray.add_lights(abs(diff), light.width, light.height)
+
+            if light.width != width or light.height != height:
+                room_id = tray.room_id
+                self.delete_tray(tray_id)
+                self.add_tray_to_room(room_id, tray_name, num_of_lights, width, height)
+
             self.db.session.commit()
             return Response(
                 type="success",

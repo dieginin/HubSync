@@ -21,6 +21,8 @@
         <div class="col d-grid">
             {{ modal_button("<i class='bi bi-pencil-fill'></i>", "editRoom", "warning", "Edit Room") }}
         </div>
+        {% include 'room/partials/edit_room.html' %}
+        {% include 'room/partials/new_tray.html' %}
         {% endif %}
     </div>
     {{ title("Room " ~ room.name) }}
@@ -29,6 +31,7 @@
     <div class="card text-center mb-3">
         <div class="card-body">
             {% set height = tray.lights[0].height %}
+            {% set width = tray.lights[0].width %}
             {% set total_cols = tray.lights | map(attribute='width') | sum %}
 
             {% set all_pots = [] %}
@@ -54,6 +57,7 @@
                 {% for col in range(total_cols) %}
                 {% set idx = col * height + row %}
                 {% if idx < all_pots|length %} {% set pot=all_pots[idx] %} <div class="pot">
+                    Pot {{ idx + 1 }}
                     {% if pot.strain %}
                     <span class="strain-initials" title="{{ pot.strain.name }}">{{ pot.strain.initials }}</span>
                     {% else %}
@@ -64,16 +68,27 @@
             {% endfor %}
             {% endfor %}
         </div>
-
+        <button class="btn btn-sm btn-outline-secondary mt-3" data-bs-toggle="collapse"
+            data-bs-target="#trayDetails{{ tray.id }}" aria-expanded="false" aria-controls="trayDetails{{ tray.id }}">
+            Toggle Details
+        </button>
+        <div class="collapse mt-3" id="trayDetails{{ tray.id }}">
+            <div class="card card-body text-start">
+                <h5>Details</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Dimensions:</strong> {{tray.lights|length }}
+                        <small>({{ width }}x{{ height }})</small>
+                    </li>
+                    <li><strong>Total Pots:</strong> {{ all_pots|length }}</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 {% else %}
 <div class="w-100 text-center text-muted">No trays found</div>
 {% endfor %}
 </div>
-
-{% include 'room/partials/edit_room.html' %}
-{% include 'room/partials/new_tray.html' %}
 
 <script src="{{ url_for('static', filename='js/pull-to-refresh.js') }}"></script>
 {% endblock %}
